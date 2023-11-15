@@ -1,7 +1,4 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
-
+#include "dummy-service.h"
 
 // Function to initialize the dummy service
 void dummy_service_init(struct dummy_service *service) {
@@ -26,6 +23,8 @@ void dummy_service_update(struct dummy_service *service) {
 // The following code is an example of how to use the dummy service in the main program
 /*
 // Create an global instance of the dummy service structure
+#include <avr/interrupt.h>
+#include <util/delay.h>
 struct dummy_service dummy_service_instance;
 
 // Timer ISR (Interrupt Service Routine) that calls the dummy service update function
