@@ -5,6 +5,7 @@
 #include <avr/io.h>
 #include <util/atomic.h>
 #include <util/usa_dst.h>
+#include <math.h>
 
 /**
  * @brief Function to check if the year is a leap year
@@ -40,6 +41,22 @@ void clock_service_update(clock_service *service)
         return;
     }
 
+#if !(RTC_CRYSTAL_PRESENT)
+    if (!service->_is_1hz)
+    {
+
+        // Based on the frequency of the clock, we can run our own counter to determine when to update the time at 1Hz
+        if (service->_counter++ < service->_frequency)
+        {
+            return;
+        }
+        else
+        {
+            service->_counter = 0;
+        }
+    }
+#endif
+
 // We can use the libc time functions if we want, or we can implement our own time keeping code
 #if USE_LIBC_TIME
     system_tick();
@@ -48,71 +65,71 @@ void clock_service_update(clock_service *service)
     {
         // Time keeping code
         // Put in atomic block to ensure time is updated fully before it is read
-        ++service->time.tm_sec;
-        if (service->time.tm_sec == 60)
+        ++service->_time.tm_sec;
+        if (service->_time.tm_sec == 60)
         {
-            service->time.tm_sec = 0;
-            ++service->time.tm_min;
-            if (service->time.tm_min == 60)
+            service->_time.tm_sec = 0;
+            ++service->_time.tm_min;
+            if (service->_time.tm_min == 60)
             {
-                service->time.tm_min = 0;
-                ++service->time.tm_hour;
-                if (service->time.tm_hour == 24)
+                service->_time.tm_min = 0;
+                ++service->_time.tm_hour;
+                if (service->_time.tm_hour == 24)
                 {
-                    service->time.tm_hour = 0;
+                    service->_time.tm_hour = 0;
                     // Weekday incrementer
-                    ++service->time.tm_wday;
-                    if (service->time.tm_wday == 7)
+                    ++service->_time.tm_wday;
+                    if (service->_time.tm_wday == 7)
                     {
-                        service->time.tm_wday = 0;
+                        service->_time.tm_wday = 0;
                     }
 
                     // Yearday incrementer
-                    ++service->time.tm_yday;
-                    if ((service->time.tm_yday == 366) && (not_leap(&service->time)))
+                    ++service->_time.tm_yday;
+                    if ((service->_time.tm_yday == 366) && (not_leap(&service->_time)))
                     {
-                        service->time.tm_yday = 0;
+                        service->_time.tm_yday = 0;
                     }
-                    else if ((service->time.tm_yday == 367) && (!not_leap(&service->time)))
+                    else if ((service->_time.tm_yday == 367) && (!not_leap(&service->_time)))
                     {
-                        service->time.tm_yday = 0;
+                        service->_time.tm_yday = 0;
                     }
 
                     // Monthday, month, and year incrementers
-                    ++service->time.tm_mday;
-                    if (service->time.tm_mday == 32)
+                    ++service->_time.tm_mday;
+                    if (service->_time.tm_mday == 32)
                     {
-                        service->time.tm_mon++;
-                        service->time.tm_mday = 1;
+                        service->_time.tm_mon++;
+                        service->_time.tm_mday = 1;
                     }
-                    else if (service->time.tm_mday == 31)
+                    else if (service->_time.tm_mday == 31)
                     {
-                        if ((service->time.tm_mon == 4) || (service->time.tm_mon == 6) || (service->time.tm_mon == 9) || (service->time.tm_mon == 11))
+                        if ((service->_time.tm_mon == 4) || (service->_time.tm_mon == 6) || (service->_time.tm_mon == 9) || (service->_time.tm_mon == 11))
                         {
-                            service->time.tm_mon++;
-                            service->time.tm_mday = 1;
+                            service->_time.tm_mon++;
+                            service->_time.tm_mday = 1;
                         }
                     }
-                    else if (service->time.tm_mday == 30)
+                    else if (service->_time.tm_mday == 30)
                     {
-                        if (service->time.tm_mon == 2)
+                        if (service->_time.tm_mon == 2)
                         {
-                            service->time.tm_mon++;
-                            service->time.tm_mday = 1;
+                            service->_time.tm_mon++;
+                            service->_time.tm_mday = 1;
                         }
                     }
-                    else if (service->time.tm_mday == 29)
+                    else if (service->_time.tm_mday == 29)
                     {
-                        if ((service->time.tm_mon == 2) && (not_leap(&service->time)))
+                        if ((service->_time.tm_mon == 2) && (not_leap(&service->_time)))
                         {
-                            service->time.tm_mon++;
-                            service->time.tm_mday = 1;
+                            service->_time.tm_mon++;
+                            service->_time.tm_mday = 1;
                         }
                     }
-                    if (service->time.tm_mon == 13)
+                    if (service->_time.tm_mon == 13)
                     {
-                        service->time.tm_mon = 1;
-                        service->time.tm_year++;
+                        service->_time.tm_mon = 1;
+                        service->_time.tm_year++;
                     }
                 }
             }
@@ -213,12 +230,12 @@ clock_op_handle_t clock_service_add_op(clock_service *service, void (*op)(clock_
 
 void clock_service_set_time_custom(clock_service *service, struct tm *time_s)
 {
-    service->time = *time_s;
+    service->_time = *time_s;
 }
 
 void clock_service_get_time_custom(clock_service *service, struct tm *time_s)
 {
-    *time_s = service->time;
+    *time_s = service->_time;
 }
 
 void clock_service_set_time_libc(clock_service *service, struct tm *time_s)
@@ -240,15 +257,15 @@ void clock_service_init(clock_service *service)
     // Initialize service parameters
 
     // Initialize time to epoch Midnight Jan 1 2000
-    service->time.tm_sec = 0;
-    service->time.tm_min = 0;
-    service->time.tm_hour = 0;
-    service->time.tm_mday = 0;
-    service->time.tm_wday = 0;
-    service->time.tm_mon = 0;
-    service->time.tm_year = 100;
-    service->time.tm_yday = 0;
-    service->time.tm_isdst = 0;
+    service->_time.tm_sec = 0;
+    service->_time.tm_min = 0;
+    service->_time.tm_hour = 0;
+    service->_time.tm_mday = 0;
+    service->_time.tm_wday = 0;
+    service->_time.tm_mon = 0;
+    service->_time.tm_year = 100;
+    service->_time.tm_yday = 0;
+    service->_time.tm_isdst = 0;
 
 // We can use the libc time functions if we want, or we can implement our own time keeping code
 #if USE_LIBC_TIME
@@ -262,7 +279,11 @@ void clock_service_init(clock_service *service)
     set_system_time(7 * ONE_HOUR);
 #endif
     service->is_awake = true;
-    // ...
+    service->_clock_prescaler = 0xFFFF;
+    service->_clock_top = 0xFFFF;
+    service->_frequency = 0xFFFF;
+    service->_counter = 0;
+    service->_is_1hz = true;
 
     // Initialize function pointers
     service->update = clock_service_update;
@@ -302,13 +323,11 @@ void clock_service_init(clock_service *service)
     // Setup timer2 for 1Hz (or whatever is the slowest possible) using F_CPU as a clock source (time won't be accurate as 1Hz not possible with F_CPU=16MHz)
 
     // Caclulate the timer prescaler value and the compare match value
-    uint8_t clock_prescaler = 0;
-    uint64_t clock_top = 0;
 
-    for (clock_prescaler = 0; clock_prescaler < 8; clock_prescaler++)
+    for (service->_clock_prescaler = 0; service->_clock_prescaler < 8; service->_clock_prescaler++)
     {
-        clock_top = F_CPU / (2 * 1 * (uint64_t)prescaler_values[clock_prescaler]) - 1;
-        if (clock_top <= 255)
+        service->_clock_top = EXT_CLK / (1 * (uint64_t)prescaler_values[service->_clock_prescaler]) - 1;
+        if (service->_clock_top <= 255)
         {
             break;
         }
@@ -316,18 +335,20 @@ void clock_service_init(clock_service *service)
 
     // If the clock top is greater than 255, we could not find a prescaler value that would work for 1Hz
     // So we set the clock top to 255 and set the prescaler to 1024 to get the slowest possible clock
-    if (clock_top > 255)
+    if (service->_clock_top > 255)
     {
-        clock_top = 255;
-        clock_prescaler = 7;
+        service->_clock_top = 255;
+        service->_clock_prescaler = 7;
+        service->_frequency = (uint16_t)(EXT_CLK / (uint64_t)prescaler_values[service->_clock_prescaler]) / (service->_clock_top);
+        service->_is_1hz = false;
     }
 
-    TCCR2B = 0;                         // stop Timer 2
-    TIMSK2 = 0;                         // disable Timer 2 interrupts
-    TCNT2 = 0;                          // clear Timer 2 counter
-    TCCR2A = (1 << WGM21);              // CTC mode, no port output
-    TCCR2B = (0b111 & clock_prescaler); // Set prescaler
-    OCR2A = clock_top;                  // set CTC compare value
+    TCCR2B = 0;                                   // stop Timer 2
+    TIMSK2 = 0;                                   // disable Timer 2 interrupts
+    TCNT2 = 0;                                    // clear Timer 2 counter
+    TCCR2A = (1 << WGM21);                        // CTC mode, no port output
+    TCCR2B = (0b111 & service->_clock_prescaler); // Set prescaler
+    OCR2A = service->_clock_top;                  // set CTC compare value
 
     TIFR2 = 0xFF;           // clear all interrupt flags
     TIMSK2 = (1 << OCIE2A); // enable Timer2 compare match A interrupt

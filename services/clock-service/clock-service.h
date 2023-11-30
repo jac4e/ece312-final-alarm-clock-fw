@@ -17,8 +17,6 @@ typedef enum
     YEAR_OP
 } op_type;
 
-
-
 // Define the structure for the clock service
 typedef struct clock_service clock_service;
 
@@ -28,7 +26,12 @@ struct clock_service
     // Public variables
 
     // Private variables
-    struct tm time; // Not guaranteed to be correct, use get_time() and set_time() instead
+    uint16_t _clock_prescaler; // is >7 if not initialized
+    uint16_t _clock_top;       // is >255 if not initialized
+    uint16_t _frequency;       // is >255 if not initialized
+    uint16_t _counter;
+    bool _is_1hz;    // True if the clock is running at 1 Hz, false otherwise
+    struct tm _time; // Not guaranteed to be correct, use get_time() and set_time() instead
     bool is_awake;
 
     // Array of function pointers for 1 second, 1 minute, 1 hour, 1 day, 1 month, 1 year, etc. operations
@@ -52,7 +55,6 @@ struct clock_service
     void (*set_time)(clock_service *service, struct tm *time);
     // Function to get the time
     void (*get_time)(clock_service *service, struct tm *time);
-
 };
 
 #endif // CLOCK_SERVICE_H

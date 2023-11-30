@@ -8,7 +8,7 @@
 
 #define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
 // #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
-// #define F_CPU 1000000UL // For ATmega328P (8 MHz internal clock)
+// #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)
 
 /* UART baud rate */
 #define UART_BAUD  9600
@@ -21,6 +21,17 @@
 #define HD44780_D4 D, 2
 
 #define RTC_CRYSTAL_PRESENT 0 // Set to 1 if RTC crystal is present, 0 otherwise
-#define USE_LIBC_TIME 1 // Set to 1 to use the time.h library, 0 to use custom incrementer
+#define ONEMHZ_CRYSTAL_PRESENT 0 // Set to 1 if 1 MHz crystal is present, 0 otherwise
+#define USE_LIBC_TIME 1 // Set to 1 to use the time.h libraries built in time keeping functions, 0 to use custom time keeping service update function
+
+#define CLOCK_COUNTER_PRECISION 1000 // The precision of the clock counter when 1Hz cannot be achieved without software correction
+
+#if RTC_CRYSTAL_PRESENT
+#define EXT_CLK 32768
+#elif ONEMHZ_CRYSTAL_PRESENT
+#define EXT_CLK 1000000
+#else
+#define EXT_CLK F_CPU
+#endif
 
 #endif // DEFINES_H
