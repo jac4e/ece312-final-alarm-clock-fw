@@ -19,6 +19,8 @@
 
 #include "lcd.h"
 #include "hd44780.h"
+
+#include "interfaces/audio-interface/audio-interface.h"
 #include "services/clock-service/clock-service.h"
 
 // Setup Device Globals
@@ -27,6 +29,8 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /*************************/
 /* Interface Definitions */
 /*************************/
+
+//struct audio_device audio_instance;
 
 /***********************/
 /* Service Definitions */
@@ -41,7 +45,7 @@ volatile clock_service clock_service_instance;
 ISR(TIMER2_OVF_vect) {
 #else
 ISR(TIMER2_COMPA_vect) {
-#endif    
+#endif
     // This ISR will be called when Timer2 overflows (Roughly ever second)
     // Call the clock service update function
     clock_service_instance.update(&clock_service_instance);
@@ -52,9 +56,15 @@ ISR(TIMER2_COMPA_vect) {
 /****************/
 
 int main(int argc, char** argv) {
+    // disable external clock source (use internal clock source)
+//    ASSR &= ~(1 << AS2);
+
     // Interface Initialization
     lcd_init();
+//    audio_init(&audio_instance);
+
     // Service Initialization
+//    audio_service_init(&audio_service_instance);
     clock_service_init(&clock_service_instance);
 
     sei();
