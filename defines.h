@@ -6,19 +6,19 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
-// #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
+//#define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
+ #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
 // #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)
 
 /* UART baud rate */
 #define UART_BAUD  9600
 
 /* HD44780 LCD port connections */
-#define HD44780_RS C, 5
-#define HD44780_RW C, 3
-#define HD44780_E  D, 7
+#define HD44780_RS D, 7
+#define HD44780_RW D, 5
+#define HD44780_E  D, 4
 /* The data bits have to be not only in ascending order but also consecutive. */
-#define HD44780_D4 D, 2
+#define HD44780_D4 D, 0
 
 #define RTC_CRYSTAL_PRESENT 0 // Set to 1 if RTC crystal is present, 0 otherwise
 #define ONEMHZ_CRYSTAL_PRESENT 0 // Set to 1 if 1 MHz crystal is present, 0 otherwise
