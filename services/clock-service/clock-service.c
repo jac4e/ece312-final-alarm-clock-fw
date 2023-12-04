@@ -429,8 +429,6 @@ void clock_service_init(clock_service *service)
         }
     }
 
-    // If the clock top is greater than 255, we could not find a prescaler value that would work for 1Hz
-    // So we set the clock top to 255 and set the prescaler to 1024 to get the slowest possible clock
     if (service->_clock_top > 255)
     {
         
@@ -453,16 +451,18 @@ void clock_service_init(clock_service *service)
             if((service->_frequency % i) == 0){
                 
                 // sets the clock top value to the largest factor of the 
-                // pre-scaled clock
-                service->_clock_top = i;
+                // pre-scaled clock - 1
+                service->_clock_top = i - 1;
                 break;
             }
             
         }
+         
+        // sets the service frequency
+         service->_frequency /= (service->_clock_top + 1);
         
         // sets the service frequency to 1 less than the actual frequency of the
-        // service since the service counter starts at 0
-        service->_frequency /= service->_clock_top;        
+        // service since the service counter starts at 0     
         service->_is_1hz = false;
     }
 ;
