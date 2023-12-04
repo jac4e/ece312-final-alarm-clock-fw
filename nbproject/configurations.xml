@@ -17,6 +17,12 @@
         <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
       </logicalFolder>
       <logicalFolder name="services" displayName="services" projectFiles="true">
+        <logicalFolder name="audio-service"
+                       displayName="audio-service"
+                       projectFiles="true">
+          <itemPath>services/audio-service/audio-service.c</itemPath>
+          <itemPath>services/audio-service/audio-service.h</itemPath>
+        </logicalFolder>
         <logicalFolder name="clock-service"
                        displayName="clock-service"
                        projectFiles="true">

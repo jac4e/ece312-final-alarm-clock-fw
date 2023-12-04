@@ -20,6 +20,9 @@ typedef enum {
     AUDIO_CHANGE_TRACK,
 } audio_command;
 
+// Forward declaration of the audio device structure
+typedef volatile struct audio_device audio_device;
+
 /**
  * @brief Audio Device Interface Structure
  * 
@@ -30,20 +33,24 @@ typedef enum {
 struct audio_device {
     // Add any device parameters here
     uint8_t _prescale; // only used for basic audio devices
-    uint8_t _top; // only used for basic audio devices
+    uint16_t _top; // only used for basic audio devices
     uint16_t _freq; // only used for basic audio devices
     audio_id _id; // 1 is basic, 0 is premium
     bool _is_muted;
     uint8_t _volume;
 
     // Function pointers for device operations
-    void (*mute)(struct audio_device *dev);
-    void (*unmute)(struct audio_device *dev);
-    void (*set_volume)(struct audio_device *dev, int volume);
-    void (*send_command)(struct audio_device *dev, audio_command command, uint8_t data); // Only used for premium audio devices
-    void (*set_freq)(struct audio_device *dev, uint16_t freq); // Only used for basic audio devices
+    void (*mute)(audio_device *dev);
+    void (*unmute)(audio_device *dev);
+    void (*set_volume)(audio_device *dev, int volume);
+    void (*send_command)(audio_device *dev, audio_command command, uint8_t data); // Only used for premium audio devices
+    void (*set_freq)(audio_device *dev, uint16_t freq); // Only used for basic audio devices
     // Add more function pointers for other operations
 };
+
+
+// Function to initialize the audio device
+void audio_interface_init(audio_device *dev);
 
 
 
