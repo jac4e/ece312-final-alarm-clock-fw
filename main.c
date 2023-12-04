@@ -49,6 +49,13 @@ ISR(TIMER2_COMPA_vect) {
     // This ISR will be called when Timer2 overflows (Roughly ever second)
     // Call the clock service update function
     clock_service_instance.update(&clock_service_instance);
+    
+    if(PINB & (1 << PB0)){
+        PORTB &= ~(1 << PB0);
+    } else {
+        PORTB |= (1 << PB0);
+    }
+    
 }
 
 /****************/
@@ -57,6 +64,8 @@ ISR(TIMER2_COMPA_vect) {
 
 int main(int argc, char** argv) {
     // disable external clock source (use internal clock source)
+    
+    DDRB |= ((1 << PB0) | (1 << PB1));
 //    ASSR &= ~(1 << AS2);
 
     // Interface Initialization
@@ -75,7 +84,7 @@ int main(int argc, char** argv) {
         struct tm time_s = {0};
         clock_service_instance.get_time(&clock_service_instance, &time_s);
         // hour:minute:second
-        fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+        fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec); 
         // day/month/year
         fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
         _delay_ms(100);

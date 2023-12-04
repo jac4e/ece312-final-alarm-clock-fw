@@ -6,8 +6,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-//#define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
- #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
+#define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
+// #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
 // #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)
 
 /* UART baud rate */
