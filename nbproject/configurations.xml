@@ -13,6 +13,8 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="interfaces" displayName="interfaces" projectFiles="true">
+        <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
+        <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
       </logicalFolder>
       <logicalFolder name="services" displayName="services" projectFiles="true">
         <logicalFolder name="clock-service"
@@ -46,10 +48,10 @@
         <targetDevice>ATmega328P</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>mEdbgTool</platformTool>
         <languageToolchain>AVR</languageToolchain>
         <languageToolchainVersion>7.3.0</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>4</platform>
       </toolsSet>
       <packs>
         <pack name="ATmega_DFP" vendor="Microchip" version="3.0.158"/>

@@ -20,6 +20,8 @@
 #include "lcd.h"
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
+#include "services/audio-service/audio-service.h"
+#include "interfaces/audio-interface/audio-interface.h"
 
 // Setup Device Globals
 static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
@@ -28,11 +30,14 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /* Interface Definitions */
 /*************************/
 
+volatile struct audio_device audio_device_instance;
+
 /***********************/
 /* Service Definitions */
 /***********************/
 
 volatile clock_service clock_service_instance;
+// volatile audio_service audio_service_instance;
 
 /*******************/
 /* ISR Definitions */
@@ -47,12 +52,20 @@ ISR(TIMER2_COMPA_vect) {
     clock_service_instance.update(&clock_service_instance);
 }
 
+// ISR(TIMER0_COMPA_vect) {
+
+// }
+
 /****************/
 /* Main Program */
 /****************/
 
 int main(int argc, char** argv) {
     // Interface Initialization
+    audio_interface_init(&audio_device_instance);
+
+    audio_device_instance.unmute(&audio_device_instance);
+
     lcd_init();
     // Service Initialization
     clock_service_init(&clock_service_instance);
