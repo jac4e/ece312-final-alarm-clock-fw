@@ -13,11 +13,11 @@
 #define AUDIO_ID_PORT PC0
 #define AUDIO_PWM_AMP_SHDN_PORT PD6
 /* HD44780 LCD port connections */
-#define HD44780_RS C, 5
-#define HD44780_RW C, 3
-#define HD44780_E  D, 7
+#define HD44780_RS D, 7
+#define HD44780_RW D, 5
+#define HD44780_E  D, 4
 /* The data bits have to be not only in ascending order but also consecutive. */
-#define HD44780_D4 D, 2
+#define HD44780_D4 D, 0
 
 /**********************/
 /* System Definitions */
