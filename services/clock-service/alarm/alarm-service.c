@@ -1,20 +1,23 @@
-#include "dummy-service.h"
+#include "alarm-service.h"
+#include <avr/cpufunc.h>
 
-// Function to initialize the dummy service
-void dummy_service_init(struct dummy_service *service) {
-    // Initialize service parameters
-    service->dummy_param1 = 0;
-    // ...
-
-    // Initialize function pointers
-    service->dummy_update = dummy_service_update;
-
-    // Implement any additional initialization here
+void alarm_service_setAlarm(alarm_service_t *alarm_service, struct tm *setTime, uint8_t alarmSelection){
+    // Not implemented
+    _NOP();
+}
+// Checks the alarms to see if any should be triggered
+void alarm_service_checkAlarms(alarm_service_t *alarm_service, clock_service *mainClock){
+    // Not implemented
+    _NOP();
+}
+// disables an alarm
+void alarm_service_disableAlarm(alarm_service_t *alarm_service, uint8_t alarmSelection){
+    // Not implemented
+    _NOP();
 }
 
-// Function to update the dummy service (called during interrupts or timer events)
-void dummy_service_update(struct dummy_service *service) {
-    // Implement the service update logic
-    // This function will be called periodically by interrupts or timers
-    // Example: service->dummy_param1++;
+void alarm_service_init(alarm_service_t *alarm_service) {
+    alarm_service->setAlarm = alarm_service_setAlarm;
+    alarm_service->checkAlarms = alarm_service_checkAlarms;
+    alarm_service->disableAlarm = alarm_service_disableAlarm;
 }
