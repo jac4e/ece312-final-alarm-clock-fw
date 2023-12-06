@@ -64,6 +64,14 @@ ISR(TIMER0_COMPA_vect) {
 /****************/
 
 int main(int argc, char** argv) {
+    // disable external clock source (use internal clock source)
+
+    // enables LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+    
+//    ASSR &= ~(1 << AS2);
+
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
 
