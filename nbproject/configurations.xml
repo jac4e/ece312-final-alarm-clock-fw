@@ -13,8 +13,22 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="interfaces" displayName="interfaces" projectFiles="true">
-        <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
-        <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
+        <logicalFolder name="f1" displayName="audio-interface" projectFiles="true">
+          <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
+          <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="gesture-interface"
+                       displayName="gesture-interface"
+                       projectFiles="true">
+          <itemPath>interfaces/gesture-interface/gesture-interface.c</itemPath>
+          <itemPath>interfaces/gesture-interface/gesture-interface.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="gesture-service"
+                       displayName="gesture-service"
+                       projectFiles="true">
+          <itemPath>services/gesture-service/gesture-service.c</itemPath>
+          <itemPath>services/gesture-service/gesture-service.h</itemPath>
+        </logicalFolder>
       </logicalFolder>
       <logicalFolder name="services" displayName="services" projectFiles="true">
         <logicalFolder name="audio-service"
@@ -26,6 +40,10 @@
         <logicalFolder name="clock-service"
                        displayName="clock-service"
                        projectFiles="true">
+          <logicalFolder name="alarm" displayName="alarm" projectFiles="true">
+            <itemPath>services/clock-service/alarm/alarm-service.c</itemPath>
+            <itemPath>services/clock-service/alarm/alarm-service.h</itemPath>
+          </logicalFolder>
           <itemPath>services/clock-service/clock-service.c</itemPath>
           <itemPath>services/clock-service/clock-service.h</itemPath>
         </logicalFolder>
