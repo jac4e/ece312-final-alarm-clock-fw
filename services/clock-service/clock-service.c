@@ -425,7 +425,7 @@ void clock_service_init(clock_service *service)
     }
 
 
-    // Setup timer2 for 1Hz (or whatever is the slowest possible whole frequency) using F_CPU as a clock source 
+    // Setup timer2 for 1Hz (or whatever is the slowest possible whole frequency) using EXT_CLK as a clock source 
     // Caclulate the timer prescaler value and the compare match value so that the service frequncy is a whole number
     if (service->_clock_top > 255)
     {
@@ -444,7 +444,7 @@ void clock_service_init(clock_service *service)
         } 
         
         // determines the largest 8 bit value that is a factor of the 
-        // pre-scaled F_CPU clock 
+        // pre-scaled EXT_CLK clock 
         for(uint8_t i = 255; i > 0; i--){
             if((service->_frequency % i) == 0){
                 
