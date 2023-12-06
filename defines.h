@@ -12,6 +12,10 @@
 
 #define AUDIO_ID_PORT PC0
 #define AUDIO_PWM_AMP_SHDN_PORT PD6
+#define AUDIO_TWI_SCL_PORT PC5
+#define AUDIO_TWI_SDA_PORT PC4
+
+
 /* HD44780 LCD port connections */
 #define HD44780_RS D, 7
 #define HD44780_RW D, 5

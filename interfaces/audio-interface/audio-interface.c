@@ -1,14 +1,14 @@
 #include "audio-interface.h"
+#include "twi.h"
 #include <stddef.h>
 
-// void audio_send_command(audio_device *dev, audio_command command, uint8_t data) {
-//     // Send command to audio device
-//     TWI_start();
-//     TWI_write(AUDIO_DEVICE_ADDR);
-//     TWI_write(command);
-//     TWI_write(data);
-//     TWI_stop();
-// }
+void audio_send_command(audio_device_t *dev, audio_command command, uint8_t data) {
+    // Send command to audio device
+    uint8_t buffer[2];
+    buffer[0] = command;
+    buffer[1] = data;
+    twi_write(AUDIO_DEVICE_ADDR, buffer, 2);
+}
 
 void audio_mute_basic(audio_device_t *dev) {
     // Disconnect OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) from timer0
@@ -53,10 +53,10 @@ void audio_unmute_premium(audio_device_t *dev) {
     PORTD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
 }
 
-// void audio_set_volume_premium(audio_device *dev, int volume) {
-//     // Send volume command to audio device
-//     audio_send_command(dev, AUDIO_SET_VOLUME, volume);
-// }
+void audio_set_volume_premium(audio_device_t *dev, int volume) {
+    // Send volume command to audio device
+    audio_send_command(dev, AUDIO_SET_VOLUME, volume);
+}
 
 // Function to initialize the audio device
 void audio_interface_init(audio_device_t *dev) {

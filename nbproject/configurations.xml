@@ -13,8 +13,14 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="interfaces" displayName="interfaces" projectFiles="true">
-        <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
-        <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
+        <logicalFolder name="audio-interface"
+                       displayName="audio-interface"
+                       projectFiles="true">
+          <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
+          <itemPath>interfaces/audio-interface/twi.h</itemPath>
+          <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
+          <itemPath>interfaces/audio-interface/twi.c</itemPath>
+        </logicalFolder>
       </logicalFolder>
       <logicalFolder name="services" displayName="services" projectFiles="true">
         <logicalFolder name="audio-service"
