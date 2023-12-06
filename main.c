@@ -4,7 +4,7 @@
  *
  * Created on November 14, 2023, 10:44 PM
  */
-
+#define F_CPU 16000000UL
 #include "defines.h"
 
 #include <stdio.h>
@@ -20,9 +20,10 @@
 #include "lcd.h"
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
+#include "services/ui-service/ui-service.h"
 
 // Setup Device Globals
-static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
+//extern FILE lcd;
 
 /*************************/
 /* Interface Definitions */
@@ -33,6 +34,8 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /***********************/
 
 volatile clock_service clock_service_instance;
+
+volatile ui_data ui_data_instance = {0,1,0};
 
 /*******************/
 /* ISR Definitions */
@@ -47,15 +50,35 @@ ISR(TIMER2_COMPA_vect) {
     clock_service_instance.update(&clock_service_instance);
 }
 
+ISR(PCINT0_vect){//check buttons
+    if(!(PINB & (1<<PINB0))){
+        ui_data_instance.button=1;
+    }
+    if(!(PINB & (1<<PINB1))){
+        ui_data_instance.button=2;
+    }
+    if(!(PINB & (1<<PINB2))){
+        ui_data_instance.button=3;
+    }
+    if(!(PINB & (1<<PINB3))){
+        ui_data_instance.button=4;
+    }
+    
+}
+
 /****************/
 /* Main Program */
 /****************/
 
 int main(int argc, char** argv) {
-    // Interface Initialization
-    lcd_init();
+    
     // Service Initialization
+    ui_service_init(&ui_data_instance);
     clock_service_init(&clock_service_instance);
+    
+    // Interface Initialization
+    //lcd_init();
+    
 
     sei();
     
@@ -65,9 +88,14 @@ int main(int argc, char** argv) {
         struct tm time_s = {0};
         clock_service_instance.get_time(&clock_service_instance, &time_s);
         // hour:minute:second
-        fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+        //fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
+        //fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
+        //cli();
+        ui_update(&time_s);
+        ui_data_instance.button=0;
+        //sei();
+        
         _delay_ms(100);
     }
 
