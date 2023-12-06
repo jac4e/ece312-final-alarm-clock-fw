@@ -49,13 +49,6 @@ ISR(TIMER2_COMPA_vect) {
     // This ISR will be called when Timer2 overflows (Roughly ever second)
     // Call the clock service update function
     clock_service_instance.update(&clock_service_instance);
-    
-    if(PINB & (1 << PB0)){
-        PORTB &= ~(1 << PB0);
-    } else {
-        PORTB |= (1 << PB0);
-    }
-    
 }
 
 /****************/
@@ -64,8 +57,7 @@ ISR(TIMER2_COMPA_vect) {
 
 int main(int argc, char** argv) {
     // disable external clock source (use internal clock source)
-    
-    DDRB |= ((1 << PB0) | (1 << PB1));
+
 //    ASSR &= ~(1 << AS2);
 
     // Interface Initialization

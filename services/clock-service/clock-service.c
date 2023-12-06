@@ -51,14 +51,9 @@ void clock_service_update(clock_service *service)
             return;
         }
         else
-        {
+        {   
+            // resets the service counter to 1
             service->_counter = 1;
-            
-            if(PINB & (1 << PB1)){
-                PORTB &= ~(1 << PB1);
-            } else {
-                PORTB |= (1 << PB1);
-            }
         }
     }
 #endif
@@ -429,6 +424,9 @@ void clock_service_init(clock_service *service)
         }
     }
 
+
+    // Setup timer2 for 1Hz (or whatever is the slowest possible whole frequency) using F_CPU as a clock source 
+    // Caclulate the timer prescaler value and the compare match value so that the service frequncy is a whole number
     if (service->_clock_top > 255)
     {
         
@@ -446,7 +444,7 @@ void clock_service_init(clock_service *service)
         } 
         
         // determines the largest 8 bit value that is a factor of the 
-        // pre-scaled clock 
+        // pre-scaled F_CPU clock 
         for(uint8_t i = 255; i > 0; i--){
             if((service->_frequency % i) == 0){
                 
@@ -460,12 +458,9 @@ void clock_service_init(clock_service *service)
          
         // sets the service frequency
          service->_frequency /= (service->_clock_top + 1);
-        
-        // sets the service frequency to 1 less than the actual frequency of the
-        // service since the service counter starts at 0     
         service->_is_1hz = false;
-    }
-;
+    };
+
     TCCR2B = 0;                                   // stop Timer 2
     TIMSK2 = 0;                                   // disable Timer 2 interrupts
     TCNT2 = 0;                                    // clear Timer 2 counter
