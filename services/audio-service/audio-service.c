@@ -2,7 +2,7 @@
 
 // Function to update the audio service
 // Responsible for toggling the audio output for basic audio devices so that it beeps not just has a continuous tone
-void audio_service_update(audio_service *service) {
+void audio_service_update(audio_service_t *service) {
     if (service->_is_playing == false || service->_audio_interface->_id == AUDIO_PREMIUM)
     {
         return;
@@ -30,7 +30,7 @@ void audio_service_update(audio_service *service) {
 }
 
 // Function to play the alarm
-void audio_service_play(audio_service *service) {
+void audio_service_play(audio_service_t *service) {
     if (service->_audio_interface->_id == AUDIO_BASIC) {
         // Enable the overflow interrupt for Timer0
         TIMSK0 |= (1 << OCIE0A);
@@ -44,7 +44,7 @@ void audio_service_play(audio_service *service) {
 }
 
 // Function to pause the alarm
-void audio_service_pause(audio_service *service) {
+void audio_service_pause(audio_service_t *service) {
     if (service->_audio_interface->_id == AUDIO_BASIC) {
         // Disable the overflow interrupt for Timer0
         TIMSK0 &= ~(1 << OCIE0A);
@@ -58,7 +58,7 @@ void audio_service_pause(audio_service *service) {
 }
 
 // Function to change the alarm type
-void audio_service_change_alarm(audio_service *service, audio_service_alarm_type alarm_type) {
+void audio_service_change_alarm(audio_service_t *service, audio_service_alarm_type alarm_type) {
     service->_alarm_type = alarm_type;
 
     if (service->_audio_interface->_id == AUDIO_BASIC) {
@@ -88,7 +88,7 @@ void audio_service_change_alarm(audio_service *service, audio_service_alarm_type
 
 
 // Function to initialize the audio service
-void audio_service_init(audio_service *service, audio_device *audio_interface) {
+void audio_service_init(audio_service_t *service, audio_device_t *audio_interface) {
     // Initialize service parameters
     service->_audio_interface = audio_interface;
     service->_is_playing = false;

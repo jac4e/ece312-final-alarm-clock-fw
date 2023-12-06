@@ -30,14 +30,14 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /* Interface Definitions */
 /*************************/
 
-audio_device audio_device_instance;
+audio_device_t audio_device_instance;
 
 /***********************/
 /* Service Definitions */
 /***********************/
 
 volatile clock_service clock_service_instance;
-audio_service audio_service_instance;
+audio_service_t audio_service_instance;
 
 /*******************/
 /* ISR Definitions */

@@ -17,24 +17,24 @@ typedef enum {
 } audio_service_alarm_type;
 
 // Forward declaration of the audio service structure
-typedef volatile struct audio_service audio_service;
+typedef volatile struct audio_service_t audio_service_t;
 
 // Define the structure for the audio service
-struct audio_service {
+struct audio_service_t {
     // Add any service parameters here
-    audio_device *_audio_interface;
+    audio_device_t *_audio_interface;
     audio_service_alarm_type _alarm_type;
     bool _is_playing;
     uint32_t _alarm_counter;
 
     // Function pointers for service operations
-    void (*update)(audio_service *service);
-    void (*play)(audio_service *service);
-    void (*pause)(audio_service *service);
-    void (*change_alarm)(audio_service *service, audio_service_alarm_type alarm);
+    void (*update)(audio_service_t *service);
+    void (*play)(audio_service_t *service);
+    void (*pause)(audio_service_t *service);
+    void (*change_alarm)(audio_service_t *service, audio_service_alarm_type alarm);
 };
 
 // Define the init function for the audio service
-void audio_service__init(audio_service *service, audio_device *audio_interface);
+void audio_service_init(audio_service_t*service, audio_device_t *audio_interface);
 
 #endif // audio_SERVICE_H
