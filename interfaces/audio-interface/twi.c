@@ -108,6 +108,10 @@ int8_t twi_read(uint8_t addr, uint8_t *data, uint8_t len) {
 }
 
 void twi_init(uint32_t frequency) {
+    // Configure SCL and SDA pins internal pullups
+    DDRC &= ~(1 << AUDIO_TWI_SCL_PORT) & ~(1 << AUDIO_TWI_SDA_PORT);
+    PORTC |= (1 << AUDIO_TWI_SCL_PORT) | (1 << AUDIO_TWI_SDA_PORT);
+
     // Initialize the twi_device struct
     uint8_t prescaler = 0;
     uint16_t bitrate_register = 0;

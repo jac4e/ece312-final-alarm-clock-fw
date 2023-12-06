@@ -64,8 +64,7 @@ void audio_interface_init(audio_device_t *dev) {
     DDRD &= ~(1 << AUDIO_ID_PORT);
 
     // Set ID
-    // dev->_id = (PIND & (1 << AUDIO_ID_PORT)) >> AUDIO_ID_PORT;
-    dev->_id = AUDIO_BASIC;
+    dev->_id = (PINC & (1 << AUDIO_ID_PORT)) >> AUDIO_ID_PORT;
     
     // Initialize device parameters
     dev->_is_muted = true;
@@ -100,14 +99,13 @@ void audio_interface_init(audio_device_t *dev) {
         TCCR0A = (1 << WGM01);
         
         // Set frequency
-        audio_set_frequency(dev, 420);
+        audio_set_frequency(dev, 220);
     } else {
         // Initialize AUDIO_PWM_AMP_SHDN_PORT pin as output for muting
         // Set AUDIO_PWM_AMP_SHDN_PORT pin as output
         DDRD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
 
         // Initialize TWI
-        // TWI_init();
-        // Set PWM pin as output
+        twi_init(100000);
     }
 }

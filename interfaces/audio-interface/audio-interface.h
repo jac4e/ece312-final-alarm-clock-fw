@@ -9,8 +9,8 @@
 #include <stdint.h>
 
 typedef enum {
-    AUDIO_BASIC,
-    AUDIO_PREMIUM
+    AUDIO_PREMIUM,
+    AUDIO_BASIC
 } audio_id;
 
 typedef enum {
