@@ -51,8 +51,9 @@ void clock_service_update(clock_service *service)
             return;
         }
         else
-        {
-            service->_counter = 0;
+        {   
+            // resets the service counter to 1
+            service->_counter = 1;
         }
     }
 #endif
@@ -372,7 +373,7 @@ void clock_service_init(clock_service *service)
     service->_clock_prescaler = 0xFFFF;
     service->_clock_top = 0xFFFF;
     service->_frequency = 0xFFFF;
-    service->_counter = 0;
+    service->_counter = 1;
     service->_is_1hz = true;
 
     // Initialize function pointers
@@ -423,15 +424,42 @@ void clock_service_init(clock_service *service)
         }
     }
 
-    // If the clock top is greater than 255, we could not find a prescaler value that would work for 1Hz
-    // So we set the clock top to 255 and set the prescaler to 1024 to get the slowest possible clock
+
+    // Setup timer2 for 1Hz (or whatever is the slowest possible whole frequency) using EXT_CLK as a clock source 
+    // Caclulate the timer prescaler value and the compare match value so that the service frequncy is a whole number
     if (service->_clock_top > 255)
     {
-        service->_clock_top = 255;
-        service->_clock_prescaler = 7;
-        service->_frequency = (uint16_t)(EXT_CLK / (uint64_t)prescaler_values[service->_clock_prescaler]) / (service->_clock_top);
+        
+        // determines the largest pre-scaler value that is a factor of MCUs clock
+        for(uint8_t i = 7; i > 0; i--){
+            if((EXT_CLK % prescaler_values[i]) == 0){      
+                
+                // sets the services pre-scaler value
+                service->_clock_prescaler = i;
+                
+                // sets the service frequency to the pre-scaled clock frequency
+                service->_frequency = EXT_CLK / prescaler_values[i];
+                break;
+            }
+        } 
+        
+        // determines the largest 8 bit value that is a factor of the 
+        // pre-scaled EXT_CLK clock 
+        for(uint8_t i = 255; i > 0; i--){
+            if((service->_frequency % i) == 0){
+                
+                // sets the clock top value to the largest factor of the 
+                // pre-scaled clock - 1
+                service->_clock_top = i - 1;
+                break;
+            }
+            
+        }
+         
+        // sets the service frequency
+         service->_frequency /= (service->_clock_top + 1);
         service->_is_1hz = false;
-    }
+    };
 
     TCCR2B = 0;                                   // stop Timer 2
     TIMSK2 = 0;                                   // disable Timer 2 interrupts
