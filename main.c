@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
         // hour:minute:second
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
+        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
         _delay_ms(100);
     }
 
