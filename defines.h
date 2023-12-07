@@ -6,6 +6,23 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+/**********************/
+/* Test Mode Settings */
+/**********************/
+
+#define TEST_MODE 1 // Set to 1 to enable test mode, 0 to disable test mode
+
+// Test sections definitions
+#define TEST_ALARM 0
+#define TEST_AUDIO_BASIC 1
+#define TEST_AUDIO_MP3 2
+#define TEST_GESTURE 3
+#define TEST_UI 4
+
+#if TEST_MODE
+#define TEST_SECTION TEST_ALARM
+#endif // TEST_MODE
+
 /*******************/
 /* Pin Definitions */
 /*******************/

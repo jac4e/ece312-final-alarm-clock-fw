@@ -21,6 +21,7 @@
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
 #include "services/audio-service/audio-service.h"
+#include "services/clock-service/alarm/alarm-service.h"
 #include "interfaces/audio-interface/audio-interface.h"
 
 // Setup Device Globals
@@ -38,6 +39,7 @@ audio_device audio_device_instance;
 
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
+alarm_service_t alarm_service_instance;
 
 /*******************/
 /* ISR Definitions */
@@ -67,23 +69,67 @@ int main(int argc, char** argv) {
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
 
+    //enable LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+    
+
     lcd_init();
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
+    initializeAlarmService(&alarm_service_instance, &audio_device_instance);
+
+    // Initialize any clock cron like operations
+    clock_service_instance.add_op(&clock_service_instance, &alarm_service_instance.updateAlarmState, &alarm_service_instance, MINUTE_OP);
+    
+    struct tm time_s = {0};
+
+    #if TEST_SECTION == TEST_ALARM
+    fprintf(&lcd, "\ecAlarm Test in 1m");
+    _delay_ms(1000);
+    clock_service_instance.get_time(&clock_service_instance, &time_s);
+    time_s.tm_min++;
+    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    #endif // TEST_ALARM
+
+    #if TEST_SECTION == TEST_AUDIO_BASIC
+    while (1)
+    {
+        for (size_t i = 0; i < AUDIO_SERVICE_ALARM_4; i++)
+        {
+            fprintf(&lcd, "\ecAlarm Track %u", i);
+            audio_service_instance.play(&audio_service_instance);
+            
+            // Wait 5 seconds
+            _delay_ms(5000);
+
+            audio_service_instance.pause(&audio_service_instance);
+
+            audio_service_instance.change_alarm(&audio_service_instance, i);
+
+            // Wait 5 seconds
+            _delay_ms(5000);
+        }
+    }
+    #endif // TEST_AUDIO
+
+    #if TEST_SECTION == TEST_GESTURE
+
+    #endif // TEST_GESTURE
 
     sei();
     
     // Main loop
     while (1) {
+        // Delay for 100ms at top of loop
+        _delay_ms(100);
         // Main program loop
-        struct tm time_s = {0};
         clock_service_instance.get_time(&clock_service_instance, &time_s);
         // hour:minute:second
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
-        _delay_ms(100);
+        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
     }
 
     return (EXIT_SUCCESS);
