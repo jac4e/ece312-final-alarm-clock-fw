@@ -62,6 +62,6 @@ struct alarm_service_t {
     void (*triggerSnooze)(alarm_service_t *service);  
 };
 
-void initializeAlarmService(alarm_service_t *service, clock_service *mainClock, audio_service *audioService);
+void initializeAlarmService(alarm_service_t *service, clock_service *mainClock, audio_service_t *audioService);
 
 #endif // DUMMY_SERVICE_H
