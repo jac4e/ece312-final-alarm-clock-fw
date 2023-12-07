@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     struct tm time_s = {0};
     clock_service_instance.get_time(&clock_service_instance, &time_s);
     time_s.tm_min++;
-//    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
     time_s.tm_min--;
 
     sei();

@@ -49,7 +49,7 @@ void alarm_service_updateAlarmState(alarm_service_t *service, clock_service *mai
   for(uint8_t i; i < 8; i++){
 
     // ensures that the alarm is only updated every second
-      if(mainClock->_service_is_1hz){
+      if(mainClock->_is_1hz){
         if(mainClock->_counter == 1){
       
         // checks the current state of the timer
