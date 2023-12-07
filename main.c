@@ -20,6 +20,7 @@
 #include "lcd.h"
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
+#include "services/clock-service/timer/timer-service.h"
 #include "services/audio-service/audio-service.h"
 #include "interfaces/audio-interface/audio-interface.h"
 
@@ -38,6 +39,7 @@ audio_device audio_device_instance;
 
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
+timer_service_t timer_service_instance;
 
 /*******************/
 /* ISR Definitions */
@@ -71,14 +73,24 @@ int main(int argc, char** argv) {
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
+    initializeTimerService(&timer_service_instance, &audio_service_instance);
+
+    struct tm time_s = {0};
+    clock_service_instance.get_time(&clock_service_instance, &time_s);
+    
+    struct tm timerLength = {0};
+    timerLength.tm_min = 1;
+    timerLength.tm_sec = 10;
+    
+    timer_service_instance.setTimer(&timer_service_instance, &clock_service_instance, &timerLength, 0);
 
     sei();
     
     // Main loop
     while (1) {
         // Main program loop
-        struct tm time_s = {0};
         clock_service_instance.get_time(&clock_service_instance, &time_s);
+        timer_service_instance.updateTimerState(&timer_service_instance, &clock_service_instance);
         // hour:minute:second
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year

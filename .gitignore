@@ -30,3 +30,5 @@ funclist
 nbproject/Makefile-*
 disassembly/
 .generated_files/
+defmplabxtrace.log
+defmplabxtrace.log.inx
