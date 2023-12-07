@@ -30,7 +30,7 @@
 /* UART baud rate */
 #define UART_BAUD  9600
 
-#define AUDIO_DEVICE_ADDR 0x00 // TODO: Add the correct address here
+#define AUDIO_DEVICE_ADDR 0x69 // TODO: Add the correct address here
 #define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
 // #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
 // #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)

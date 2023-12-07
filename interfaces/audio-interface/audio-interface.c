@@ -1,5 +1,6 @@
 #include "audio-interface.h"
 #include "twi.h"
+#include "../../common.h"
 #include <stddef.h>
 
 void audio_send_command(audio_device_t *dev, audio_command command, uint8_t data) {
@@ -79,14 +80,13 @@ void audio_interface_init(audio_device_t *dev) {
         dev->unmute = audio_unmute_basic;
         dev->set_volume = audio_set_volume_basic;
         dev->set_freq = audio_set_frequency;
-        dev->send_command = NULL;
+        dev->send_command = common_nop;
     } else if (dev->_id == AUDIO_PREMIUM) {
         dev->mute = audio_mute_premium;
         dev->unmute = audio_unmute_premium;
-        // dev->set_volume = audio_set_volume_premium;
-        // dev->send_command = audio_send_command;
-        dev->set_freq = NULL;
-        dev->send_command = NULL;
+        dev->set_volume = common_nop;
+        dev->send_command = audio_send_command;
+        dev->set_freq = common_nop;
     }
 
     if (dev->_id == AUDIO_BASIC) {

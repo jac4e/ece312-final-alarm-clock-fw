@@ -1,4 +1,5 @@
 #include "twi.h"
+#include <avr/io.h>
 
 const uint16_t twi_prescaler_values[] = {0, 1, 4, 16, 64};
 
@@ -47,32 +48,31 @@ uint8_t twi_get_status(void)
 
 int8_t twi_write(uint8_t addr, uint8_t *data, uint8_t len) {
     // Send start signal
-    twi_start();
+   twi_start();
 
     // Check for error
-    if (twi_get_status() != TW_START)
-    {
-        return -1;
-    }
+   if (twi_get_status() != TW_START)
+   {
+       return -1;
+   }
     // Send device address with write bit
     twi_write_single(addr << 1);
     // Check for error
-    if (twi_get_status() != TW_MT_SLA_ACK)
-    {
-        return -1;
-    }
+   if (twi_get_status() != TW_MT_SLA_ACK)
+   {
+       return -1;
+   }
     // che
     // Send data
     for (uint8_t i = 0; i < len; i++)
     {
         twi_write_single(data[i]);
         // Check for error
-        if (twi_get_status() != TW_MT_DATA_ACK)
-        {
-            return -1;
-        }
+       if (twi_get_status() != TW_MT_DATA_ACK)
+       {
+           return -1;
+       }
     }
-    // Send stop signal
     twi_stop();
     return 0;
 }
@@ -109,8 +109,8 @@ int8_t twi_read(uint8_t addr, uint8_t *data, uint8_t len) {
 
 void twi_init(uint32_t frequency) {
     // Configure SCL and SDA pins internal pullups
-    DDRC &= ~(1 << AUDIO_TWI_SCL_PORT) & ~(1 << AUDIO_TWI_SDA_PORT);
-    PORTC |= (1 << AUDIO_TWI_SCL_PORT) | (1 << AUDIO_TWI_SDA_PORT);
+    // DDRC &= ~(1 << AUDIO_TWI_SCL_PORT) & ~(1 << AUDIO_TWI_SDA_PORT);
+    // PORTC |= (1 << AUDIO_TWI_SCL_PORT) | (1 << AUDIO_TWI_SDA_PORT);
 
     // Initialize the twi_device struct
     uint8_t prescaler = 0;
