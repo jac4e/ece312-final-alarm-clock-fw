@@ -9,10 +9,10 @@
 // #define ALARM_AMOUNT 8 // the amount of alarms the service supports
 
 typedef enum {
-  disabled,
-  idle,
-  triggered,
-  snooze
+  alarm_disabled,
+  alarm_idle,
+  alarm_triggered,
+  alarm_snooze
 } alarmState_t;
 
 // create a structure for a single alarm

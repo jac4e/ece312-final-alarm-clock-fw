@@ -14,13 +14,13 @@
 
 // Test sections definitions
 #define TEST_ALARM 0
-#define TEST_AUDIO_BASIC 1
-#define TEST_AUDIO_PREMIUM 2
+#define TEST_TIMER 1
+#define TEST_AUDIO 2
 #define TEST_GESTURE 3
 #define TEST_UI 4
 
 #if TEST_MODE
-#define TEST_SECTION TEST_ALARM
+#define TEST_SECTION TEST_TIMER
 #endif // TEST_MODE
 
 /*******************/

@@ -20,6 +20,7 @@
 #include "lcd.h"
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
+#include "services/clock-service/timer/timer-service.h"
 #include "services/clock-service/alarm/alarm-service.h"
 #include "services/audio-service/audio-service.h"
 #include "services/gesture-service/gesture-service.h"
@@ -42,6 +43,7 @@ gesture_device_t gesture_device;
 
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
+timer_service_t timer_service_instance;
 alarm_service_t alarm_service_instance;
 gesture_service_t gesture_service;
 
@@ -92,18 +94,37 @@ int main(int argc, char** argv) {
     PORTB |= (1 << PB5);
     
 
+    //enable LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+
     lcd_init();
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
+    initializeTimerService(&timer_service_instance, &audio_service_instance);
     initializeAlarmService(&alarm_service_instance, &audio_service_instance);
     gesture_service_init(&gesture_service, &gesture_device);
 
     // Initialize any clock cron like operations
     clock_op_handle_t alarm_op_handle = {0, MINUTE_OP};
     clock_service_instance.add_op(&alarm_op_handle, &clock_service_instance, alarm_service_instance.updateAlarmState, &alarm_service_instance);
+    clock_op_handle_t timer_op_handle = {0, SECOND_OP};
+    clock_service_instance.add_op(&timer_op_handle, &clock_service_instance, timer_service_instance.updateTimerState, &timer_service_instance);
     
     struct tm time_s = {0};
+
+    #if TEST_SECTION == TEST_TIMER
+    clock_service_instance.get_time(&clock_service_instance, &time_s);
+    
+    struct tm timerLength = {0};
+    timerLength.tm_min = 1;
+    timerLength.tm_sec = 10;
+    fprintf(&lcd, "\ecTimer: %02u:%02u:%02u", timerLength.tm_hour, timerLength.tm_min, timerLength.tm_sec);
+    fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+    timer_service_instance.setTimer(&timer_service_instance, &clock_service_instance, &timerLength, 0);
+    _delay_ms(5000);
+    #endif // TEST_TIMER
 
     #if TEST_SECTION == TEST_ALARM
     clock_service_instance.get_time(&clock_service_instance, &time_s);
@@ -116,7 +137,7 @@ int main(int argc, char** argv) {
     _delay_ms(5000);
     #endif // TEST_ALARM
 
-    #if TEST_SECTION == TEST_AUDIO_BASIC
+    #if TEST_SECTION == TEST_AUDIO
     sei();
     while (1)
     {
@@ -154,6 +175,7 @@ int main(int argc, char** argv) {
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
         fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
+        _delay_ms(100);
     }
 
     return (EXIT_SUCCESS);
