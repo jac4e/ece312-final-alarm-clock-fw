@@ -69,15 +69,15 @@ void audio_service_change_alarm(audio_service *service, audio_service_alarm_type
             break;
 
         case AUDIO_SERVICE_ALARM_2:
-            service->_audio_interface->set_freq(service->_audio_interface, 440);
+            service->_audio_interface->set_freq(service->_audio_interface, 330);
             break;
 
         case AUDIO_SERVICE_ALARM_3:
-            service->_audio_interface->set_freq(service->_audio_interface, 880);
+            service->_audio_interface->set_freq(service->_audio_interface, 400);
             break;
 
         case AUDIO_SERVICE_ALARM_4:
-            service->_audio_interface->set_freq(service->_audio_interface, 1760);
+            service->_audio_interface->set_freq(service->_audio_interface, 440);
             break;
         
         default:

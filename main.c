@@ -97,22 +97,23 @@ int main(int argc, char** argv) {
     #endif // TEST_ALARM
 
     #if TEST_SECTION == TEST_AUDIO_BASIC
+    sei();
     while (1)
     {
-        for (size_t i = 0; i < AUDIO_SERVICE_ALARM_4; i++)
+        // loop through all the tracks 
+        for (uint8_t i = 0; i < (AUDIO_SERVICE_ALARM_4+1); i++)
         {
-            fprintf(&lcd, "\ecAlarm Track %u", i);
-            audio_service_instance.play(&audio_service_instance);
+            audio_service_instance.change_alarm(&audio_service_instance, i);
+            fprintf(&lcd, "\ecAlarm Track %u", i+1);
+            audio_service_instance.play(&audio_service_instance);   
             
             // Wait 5 seconds
-            _delay_ms(5000);
+            _delay_ms(2000);
 
             audio_service_instance.pause(&audio_service_instance);
 
-            audio_service_instance.change_alarm(&audio_service_instance, i);
-
             // Wait 5 seconds
-            _delay_ms(5000);
+            _delay_ms(2000);
         }
     }
     #endif // TEST_AUDIO
