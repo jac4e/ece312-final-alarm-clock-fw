@@ -20,7 +20,7 @@
 #define TEST_UI 4
 
 #if TEST_MODE
-#define TEST_SECTION TEST_TIMER
+#define TEST_SECTION TEST_ALARM
 #endif // TEST_MODE
 
 /*******************/

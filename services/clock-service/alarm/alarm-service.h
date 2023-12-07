@@ -21,7 +21,7 @@ struct alarm_t {
   uint8_t hour;
   uint8_t minute;
   alarmState_t state;            // stores the state of an alarm
-  uint16_t snoozeRemaining; // the amount of time remaining in the snooze state (in seconds)
+  uint8_t snoozeMinute;
 };
 
 // Define the structure for the alarm service
@@ -31,6 +31,7 @@ struct alarm_service_t {
     
     // stores a pointer to the system audio service
     audio_service *_alarmAudioService;
+    clock_service *_mainClockService;
 
     // The amount of time in minutes before the alarm should be re-triggered when an alarm enters snooze state
     uint8_t _snoozePeriod; 
@@ -51,6 +52,7 @@ struct alarm_service_t {
     void (*disableAlarm)(alarm_service_t *service, uint8_t alarmSelection);
     // updates the state of the alarm service
     void (*updateAlarmState)(clock_service *mainClock, alarm_service_t *service);
+
     // Sleeps the alarm service
     void (*sleep)(alarm_service_t *service);
     // wakes the alarm service
@@ -60,6 +62,6 @@ struct alarm_service_t {
     void (*triggerSnooze)(alarm_service_t *service);  
 };
 
-void initializeAlarmService(alarm_service_t *service, audio_service *audioService);
+void initializeAlarmService(alarm_service_t *service, clock_service *mainClock, audio_service *audioService);
 
 #endif // DUMMY_SERVICE_H

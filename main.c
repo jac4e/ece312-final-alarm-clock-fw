@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
     initializeTimerService(&timer_service_instance, &audio_service_instance);
-    initializeAlarmService(&alarm_service_instance, &audio_service_instance);
+    initializeAlarmService(&alarm_service_instance, &clock_service_instance, &audio_service_instance);
     gesture_service_init(&gesture_service, &gesture_device);
 
     // Initialize any clock cron like operations
