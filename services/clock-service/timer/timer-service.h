@@ -8,9 +8,9 @@
 #include "../../audio-service/audio-service.h"
 
 typedef enum {
-  disabled,
-  idle,
-  triggered,
+  timer_disabled,
+  timer_idle,
+  timer_triggered,
 } timerState_t;
 
 // create a structure for a single timer
@@ -42,7 +42,7 @@ struct timer_service_t {
     // disables a timer
     void (*disableTimer)(timer_service_t *service, uint8_t timerSelection);
     // updates the state of the timer service
-    void (*updateTimerState)(timer_service_t *service, clock_service *mainClock);
+    void (*updateTimerState)(clock_service *mainClock, timer_service_t *service);
 };
 
 void initializeTimerService(timer_service_t *service, audio_service *audioService);

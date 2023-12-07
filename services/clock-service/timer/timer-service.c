@@ -37,15 +37,15 @@ void timer_service_setTimer(timer_service_t *service, clock_service *mainClock, 
   service->_timers[timerSelection].hour   =  (uint8_t) (time_s.tm_hour);
   service->_timers[timerSelection].minute =  (uint8_t) (time_s.tm_min );
   service->_timers[timerSelection].second =  (uint8_t) (time_s.tm_sec );
-  service->_timers[timerSelection].state   = idle;
+  service->_timers[timerSelection].state   = timer_idle;
 }
 
 void timer_service_stopTimer(timer_service_t *service){
 
   // stops any timers that are triggered
   for(uint8_t i; i < 8; i++){
-    if(service->_timers[i].state == triggered){
-      service->_timers[i].state = idle;
+    if(service->_timers[i].state == timer_triggered){
+      service->_timers[i].state = timer_idle;
       service->_timerAudioService->pause(service->_timerAudioService);
     }
   }
@@ -54,44 +54,37 @@ void timer_service_stopTimer(timer_service_t *service){
 void timer_service_triggerTimer(timer_service_t *service, uint8_t timerSelection){
 
   // triggers the selected timer
-  service->_timers[timerSelection].state = triggered;
+  service->_timers[timerSelection].state = timer_triggered;
   service->_timerAudioService->play(service->_timerAudioService);
 }
 
 void timer_service_disableTimer(timer_service_t *service, uint8_t timerSelection){
 
   // disables the selected timer
-  service->_timers[timerSelection].state = disabled;
+  service->_timers[timerSelection].state = timer_disabled;
   service->_timerAudioService->pause(service->_timerAudioService);
 }
 
-void timer_service_updateTimerState(timer_service_t *service, clock_service *mainClock){
+void timer_service_updateTimerState(clock_service *mainClock, timer_service_t *service){
 
   // gets the current time from the main clock
   struct tm time_s = {0};
   mainClock->get_time(mainClock, &time_s);
 
   for(uint8_t i; i < 8; i++){
-
-    // ensures that the timer is only updated every second
-      if(!mainClock->_is_1hz){
-        if(mainClock->_counter == 1){
-      
-        // checks the current state of the timer
-        switch (service->_timers[i].state){
-          case idle:
-            // triggeres the timer if the correct time has been reached
-            if(((uint8_t) time_s.tm_hour) == service->_timers[i].hour && ((uint8_t) time_s.tm_min) == service->_timers[i].minute && ((uint8_t) time_s.tm_sec) == service->_timers[i].second){
-              service->triggerTimer(service, i);
-            }
-          break;
-          case triggered:
-            
-          default:
-
-          break;
+    // checks the current state of the timer
+    switch (service->_timers[i].state){
+      case timer_idle:
+        // triggeres the timer if the correct time has been reached
+        if(((uint8_t) time_s.tm_hour) == service->_timers[i].hour && ((uint8_t) time_s.tm_min) == service->_timers[i].minute && ((uint8_t) time_s.tm_sec) == service->_timers[i].second){
+          service->triggerTimer(service, i);
         }
-      }
+      break;
+      case timer_triggered:
+        
+      default:
+
+      break;
     }
   }
 }
@@ -100,7 +93,7 @@ void initializeTimerService(timer_service_t *service, audio_service *audioServic
   
   // disable all timers on service
   for(uint8_t i = 0; i < 8; i++){
-    service->_timers[i].state  = disabled;
+    service->_timers[i].state  = timer_disabled;
     service->_timers[i].hour   = 0;
     service->_timers[i].minute = 0;
     service->_timers[i].second = 0;

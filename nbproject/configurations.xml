@@ -36,12 +36,13 @@
         <logicalFolder name="clock-service"
                        displayName="clock-service"
                        projectFiles="true">
-          <logicalFolder name="timer" displayName="timer" projectFiles="true">
-            <itemPath>services/clock-service/timer/timer-service.c</itemPath>
-            <itemPath>services/clock-service/timer/timer-service.h</itemPath>
           <logicalFolder name="alarm" displayName="alarm" projectFiles="true">
             <itemPath>services/clock-service/alarm/alarm-service.c</itemPath>
             <itemPath>services/clock-service/alarm/alarm-service.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="timer" displayName="timer" projectFiles="true">
+            <itemPath>services/clock-service/timer/timer-service.c</itemPath>
+            <itemPath>services/clock-service/timer/timer-service.h</itemPath>
           </logicalFolder>
           <itemPath>services/clock-service/clock-service.c</itemPath>
           <itemPath>services/clock-service/clock-service.h</itemPath>
