@@ -110,6 +110,7 @@ int main(int argc, char** argv) {
     time_s.tm_min++;
     fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
     alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    alarm_service_instance._snoozePeriod = 1;
     time_s.tm_min--;
     fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
     _delay_ms(5000);
