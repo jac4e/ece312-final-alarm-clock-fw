@@ -102,7 +102,7 @@ void alarm_service_wake(alarm_service_t *service){
 }
 
 
-void initializeAlarmService(alarm_service_t *service, audio_service *audioService) {
+void initializeAlarmService(alarm_service_t *service, audio_service_t *audioService) {
   
   // disable all alarms on service
   for(uint8_t i = 0; i < 8; i++){

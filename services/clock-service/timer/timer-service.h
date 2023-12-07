@@ -28,7 +28,7 @@ typedef volatile struct timer_service_t timer_service_t;
 struct timer_service_t {
     
     // stores a pointer to the system audio service
-    audio_service *_timerAudioService;
+    audio_service_t*_timerAudioService;
 
     // Timer service has 8 timers
     timer_t _timers[8];
@@ -45,6 +45,6 @@ struct timer_service_t {
     void (*updateTimerState)(clock_service *mainClock, timer_service_t *service);
 };
 
-void initializeTimerService(timer_service_t *service, audio_service *audioService);
+void initializeTimerService(timer_service_t *service, audio_service_t*audioService);
 
 #endif // DUMMY_SERVICE_H

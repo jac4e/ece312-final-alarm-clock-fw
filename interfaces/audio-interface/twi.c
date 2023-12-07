@@ -51,27 +51,27 @@ int8_t twi_write(uint8_t addr, uint8_t *data, uint8_t len) {
    twi_start();
 
     // Check for error
-   if (twi_get_status() != TW_START)
-   {
-       return -1;
-   }
+//    if (twi_get_status() != TW_START)
+//    {
+//        return -1;
+//    }
     // Send device address with write bit
     twi_write_single(addr << 1);
     // Check for error
-   if (twi_get_status() != TW_MT_SLA_ACK)
-   {
-       return -1;
-   }
+//    if (twi_get_status() != TW_MT_SLA_ACK)
+//    {
+//        return -1;
+//    }
     // che
     // Send data
     for (uint8_t i = 0; i < len; i++)
     {
         twi_write_single(data[i]);
         // Check for error
-       if (twi_get_status() != TW_MT_DATA_ACK)
-       {
-           return -1;
-       }
+    //    if (twi_get_status() != TW_MT_DATA_ACK)
+    //    {
+    //        return -1;
+    //    }
     }
     twi_stop();
     return 0;

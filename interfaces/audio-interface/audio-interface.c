@@ -4,11 +4,22 @@
 #include <stddef.h>
 
 void audio_send_command(audio_device_t *dev, audio_command command, uint8_t data) {
-    // Send command to audio device
-    uint8_t buffer[2];
-    buffer[0] = command;
-    buffer[1] = data;
-    twi_write(AUDIO_DEVICE_ADDR, buffer, 2);
+    switch (command)
+    {
+    case AUDIO_PLAY:
+        // Set PC2 to high
+        PORTC |= (1 << PC2);
+        break;
+    case AUDIO_PAUSE:
+        // Set PC2 to low
+        PORTC &= ~(1 << PC2);
+    case AUDIO_CHANGE_TRACK:
+        // Set PC4 and PC5 based on data
+        PORTC &= ~(0b11 << PC4);
+        PORTC |= (data << PC4);
+        break;
+
+    }
 }
 
 void audio_mute_basic(audio_device_t *dev) {
@@ -45,13 +56,11 @@ void audio_set_frequency(audio_device_t *dev, uint16_t freq) {
 }
 
 void audio_mute_premium(audio_device_t *dev) {
-    // Set AUDIO_PWM_AMP_SHDN_PORT pin to low
-    PORTD &= ~(1 << AUDIO_PWM_AMP_SHDN_PORT);
+    audio_send_command(dev, AUDIO_PAUSE, 0);
 }
 
 void audio_unmute_premium(audio_device_t *dev) {
-    // Set AUDIO_PWM_AMP_SHDN_PORT pin to high
-    PORTD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
+    audio_send_command(dev, AUDIO_PLAY, 0);
 }
 
 void audio_set_volume_premium(audio_device_t *dev, int volume) {
@@ -105,7 +114,7 @@ void audio_interface_init(audio_device_t *dev) {
         // Set AUDIO_PWM_AMP_SHDN_PORT pin as output
         DDRD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
 
-        // Initialize TWI
-        twi_init(100000);
+        // Initialize  PC2-4 as output
+        DDRC |= (1 << PC2) | (1 << PC4) | (1 << PC5);
     }
 }

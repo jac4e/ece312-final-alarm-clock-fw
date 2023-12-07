@@ -89,7 +89,7 @@ void timer_service_updateTimerState(clock_service *mainClock, timer_service_t *s
   }
 }
 
-void initializeTimerService(timer_service_t *service, audio_service *audioService) {
+void initializeTimerService(timer_service_t *service, audio_service_t*audioService) {
   
   // disable all timers on service
   for(uint8_t i = 0; i < 8; i++){

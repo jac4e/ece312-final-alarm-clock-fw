@@ -20,7 +20,6 @@
           <itemPath>interfaces/audio-interface/twi.h</itemPath>
           <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
           <itemPath>interfaces/audio-interface/twi.c</itemPath>
-          <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
         </logicalFolder>
         <logicalFolder name="gesture-interface"
                        displayName="gesture-interface"

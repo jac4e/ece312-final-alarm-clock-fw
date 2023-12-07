@@ -30,7 +30,7 @@ typedef volatile struct alarm_service_t alarm_service_t;
 struct alarm_service_t {
     
     // stores a pointer to the system audio service
-    audio_service *_alarmAudioService;
+    audio_service_t*_alarmAudioService;
 
     // The amount of time in minutes before the alarm should be re-triggered when an alarm enters snooze state
     uint8_t _snoozePeriod; 
@@ -60,6 +60,6 @@ struct alarm_service_t {
     void (*triggerSnooze)(alarm_service_t *service);  
 };
 
-void initializeAlarmService(alarm_service_t *service, audio_service *audioService);
+void initializeAlarmService(alarm_service_t *service, audio_service_t*audioService);
 
 #endif // DUMMY_SERVICE_H
