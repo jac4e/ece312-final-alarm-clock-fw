@@ -21,6 +21,7 @@
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
 #include "services/audio-service/audio-service.h"
+#include "services/clock-service/alarm/alarm-service.h"
 #include "interfaces/audio-interface/audio-interface.h"
 
 // Setup Device Globals
@@ -38,6 +39,7 @@ audio_device audio_device_instance;
 
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
+alarm_service_t alarm_service_instance;
 
 /*******************/
 /* ISR Definitions */
@@ -71,6 +73,7 @@ int main(int argc, char** argv) {
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
+    initalizeAlarmService(&alarm_service_instance, &audio_device_instance);
 
     sei();
     
