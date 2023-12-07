@@ -170,7 +170,6 @@ int main(int argc, char** argv) {
         _delay_ms(100);
         // Main program loop
         clock_service_instance.get_time(&clock_service_instance, &time_s);
-        timer_service_instance.updateTimerState(&timer_service_instance, &clock_service_instance);
         // hour:minute:second
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
