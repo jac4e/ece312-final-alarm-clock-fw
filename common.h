@@ -1,8 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-// NOP function
-void common_nop(void);
-
+// Useful to assign empty funtion pointers to so that it won't crash if called
+void common_nop();
 
 #endif // COMMON_H
