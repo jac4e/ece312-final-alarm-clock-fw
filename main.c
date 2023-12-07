@@ -34,7 +34,7 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /* Interface Definitions */
 /*************************/
 
-audio_device audio_device_instance;
+audio_device_t audio_device_instance;
 gesture_device_t gesture_device;
 
 /***********************/
@@ -42,7 +42,7 @@ gesture_device_t gesture_device;
 /***********************/
 
 volatile clock_service clock_service_instance;
-audio_service audio_service_instance;
+audio_service_t audio_service_instance;
 timer_service_t timer_service_instance;
 alarm_service_t alarm_service_instance;
 gesture_service_t gesture_service;
@@ -162,6 +162,15 @@ int main(int argc, char** argv) {
     #if TEST_SECTION == TEST_GESTURE
 
     #endif // TEST_GESTURE
+
+    #if TEST_SECTION == TEST_I2C
+    fprintf(&lcd, "\ecI2C Test");
+    sei();
+    while(1){
+        audio_device_instance.send_command(&audio_device_instance, 0x04, 0x20);
+        _delay_ms(100);
+    }
+    #endif // TEST_I2C
 
     sei();
     
