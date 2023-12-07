@@ -19,6 +19,12 @@
           <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
           <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
         </logicalFolder>
+        <logicalFolder name="gesture-interface"
+                       displayName="gesture-interface"
+                       projectFiles="true">
+          <itemPath>interfaces/gesture-interface/gesture-interface.c</itemPath>
+          <itemPath>interfaces/gesture-interface/gesture-interface.h</itemPath>
+        </logicalFolder>
       </logicalFolder>
       <logicalFolder name="services" displayName="services" projectFiles="true">
         <logicalFolder name="audio-service"
@@ -33,9 +39,18 @@
           <logicalFolder name="timer" displayName="timer" projectFiles="true">
             <itemPath>services/clock-service/timer/timer-service.c</itemPath>
             <itemPath>services/clock-service/timer/timer-service.h</itemPath>
+          <logicalFolder name="alarm" displayName="alarm" projectFiles="true">
+            <itemPath>services/clock-service/alarm/alarm-service.c</itemPath>
+            <itemPath>services/clock-service/alarm/alarm-service.h</itemPath>
           </logicalFolder>
           <itemPath>services/clock-service/clock-service.c</itemPath>
           <itemPath>services/clock-service/clock-service.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="gesture-service"
+                       displayName="gesture-service"
+                       projectFiles="true">
+          <itemPath>services/gesture-service/gesture-service.c</itemPath>
+          <itemPath>services/gesture-service/gesture-service.h</itemPath>
         </logicalFolder>
       </logicalFolder>
       <itemPath>main.c</itemPath>
@@ -44,6 +59,8 @@
       <itemPath>hd44780.h</itemPath>
       <itemPath>lcd.h</itemPath>
       <itemPath>modified_lcd.c</itemPath>
+      <itemPath>common.c</itemPath>
+      <itemPath>common.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -287,8 +304,6 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-3fff"/>
         <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="/Users/westonmcclinchey/git/ece312-final-alarm-clock-fw/debug/default/default_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges" value="0-3ff"/>

@@ -6,12 +6,32 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+/**********************/
+/* Test Mode Settings */
+/**********************/
+
+#define TEST_MODE 1 // Set to 1 to enable test mode, 0 to disable test mode
+
+// Test sections definitions
+#define TEST_ALARM 0
+#define TEST_TIMER 1
+#define TEST_AUDIO 2
+#define TEST_GESTURE 3
+#define TEST_UI 4
+
+#if TEST_MODE
+#define TEST_SECTION TEST_TIMER
+#endif // TEST_MODE
+
 /*******************/
 /* Pin Definitions */
 /*******************/
 
 #define AUDIO_ID_PORT PC0
 #define AUDIO_PWM_AMP_SHDN_PORT PD6
+
+#define GESTURE_SENSOR_PIN PC3
+
 /* HD44780 LCD port connections */
 #define HD44780_RS D, 7
 #define HD44780_RW D, 5
@@ -44,5 +64,7 @@
 #else
 #define EXT_CLK F_CPU
 #endif
+
+#define GESTURE_SENSOR_SLOW_TIME 5 // Slow hand gesture is 10 or more seconds
 
 #endif // DEFINES_H

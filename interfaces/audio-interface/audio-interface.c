@@ -100,7 +100,7 @@ void audio_interface_init(audio_device *dev) {
         TCCR0A = (1 << WGM01);
         
         // Set frequency
-        audio_set_frequency(dev, 420);
+        audio_set_frequency(dev, 220);
     } else {
         // Initialize AUDIO_PWM_AMP_SHDN_PORT pin as output for muting
         // Set AUDIO_PWM_AMP_SHDN_PORT pin as output

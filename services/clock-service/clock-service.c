@@ -1,5 +1,6 @@
 #include "clock-service.h"
 #include "../../defines.h"
+#include "../../common.h"
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/io.h>
@@ -138,6 +139,37 @@ void clock_service_update(clock_service *service)
         // end of time keeping code
     }
 #endif
+
+    // Call timed operations
+    struct tm time_s = {0};
+    service->get_time(service, &time_s);
+    service->minute_ops[time_s.tm_sec](service, service->minute_ops_data[time_s.tm_sec]);
+
+    for (size_t i = 0; i < 16; i++)
+    {
+        // For those that don't make sense to have at a specific time
+        service->second_ops[i](service, service->second_ops_data[i]);
+
+        if (time_s.tm_min == 0 && time_s.tm_sec == 0)
+        {
+            service->hour_ops[i](service, service->hour_ops_data[i]);
+        }
+
+        if (time_s.tm_hour == 0 && time_s.tm_min == 0 && time_s.tm_sec == 0)
+        {
+            service->day_ops[i](service, service->day_ops_data[i]);
+        }
+
+        if (time_s.tm_mday == 1 && time_s.tm_hour == 0 && time_s.tm_min == 0 && time_s.tm_sec == 0)
+        {
+            service->month_ops[i](service, service->month_ops_data[i]);
+        }
+        
+        if (time_s.tm_mon == 0 && time_s.tm_mday == 1 && time_s.tm_hour == 0 && time_s.tm_min == 0 && time_s.tm_sec == 0)
+        {
+            service->year_ops[i](service, service->year_ops_data[i]);
+        }
+    }
 }
 
 void clock_service_sleep(clock_service *service)
@@ -159,75 +191,112 @@ void clock_service_wake(clock_service *service)
  * @param type  The interval at which to call the operation (1 second, 1 minute, 1 hour, 1 day, 1 month, 1 year). See op_type enum.
  * @return size_t
  */
-clock_op_handle_t clock_service_add_op(clock_service *service, void (*op)(clock_service *service, void *data), void *data, op_type type)
+void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, void (*op)(time_t *t, void *data), void *data, op_type type)
 {
-    size_t i = 0;
-    switch (type)
-    {
-    case SECOND_OP:
-        for (i = 0; i < 16; i++)
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+        switch (handle->type)
         {
-            if (service->second_ops[i] == NULL)
+        case SECOND_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->second_ops[i] = op;
-                break;
+                if (service->second_ops[i] == common_nop)
+                {
+                    service->second_ops[i] = op;
+                    service->second_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
-        }
-        break;
-    case MINUTE_OP:
-        for (i = 0; i < 16; i++)
-        {
-            if (service->minute_ops[i] == NULL)
+            break;
+        case MINUTE_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->minute_ops[i] = op;
-                break;
+                if (service->minute_ops[i] == common_nop)
+                {
+                    service->minute_ops[i] = op;
+                    service->minute_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
-        }
-        break;
-    case HOUR_OP:
-        for (i = 0; i < 16; i++)
-        {
-            if (service->hour_ops[i] == NULL)
+            break;
+        case HOUR_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->hour_ops[i] = op;
-                break;
+                if (service->hour_ops[i] == common_nop)
+                {
+                    service->hour_ops[i] = op;
+                    service->hour_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
-        }
-        break;
-    case DAY_OP:
-        for (i = 0; i < 16; i++)
-        {
-            if (service->day_ops[i] == NULL)
+            break;
+        case DAY_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->day_ops[i] = op;
-                break;
+                if (service->day_ops[i] == common_nop)
+                {
+                    service->day_ops[i] = op;
+                    service->day_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
-        }
-        break;
-    case MONTH_OP:
-        for (i = 0; i < 16; i++)
-        {
-            if (service->month_ops[i] == NULL)
+            break;
+        case MONTH_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->month_ops[i] = op;
-                break;
+                if (service->month_ops[i] == common_nop)
+                {
+                    service->month_ops[i] = op;
+                    service->month_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
-        }
-        break;
-    case YEAR_OP:
-        for (i = 0; i < 16; i++)
-        {
-            if (service->year_ops[i] == NULL)
+            break;
+        case YEAR_OP:
+            for (size_t i = 0; i < 16; i++)
             {
-                service->year_ops[i] = op;
-                break;
+                if (service->year_ops[i] == common_nop)
+                {
+                    service->year_ops[i] = op;
+                    service->year_ops_data[i] = data;
+                    handle->index = i;
+                }
             }
+            break;
+        default:
+            break;
         }
-        break;
-    default:
-        break;
     }
 }
+
+void clock_service_remove_op(clock_service *service, clock_op_handle_t *handle)
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+        switch (handle->type)
+        {
+        case SECOND_OP:
+            service->second_ops[handle->index] = common_nop;
+            break;
+        case MINUTE_OP:
+            service->minute_ops[handle->index] = common_nop;
+            break;
+        case HOUR_OP:
+            service->hour_ops[handle->index] = common_nop;
+            break;
+        case DAY_OP:
+            service->day_ops[handle->index] = common_nop;
+            break;
+        case MONTH_OP:
+            service->month_ops[handle->index] = common_nop;
+            break;
+        case YEAR_OP:
+            service->year_ops[handle->index] = common_nop;
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 
 void clock_service_set_time_custom(clock_service *service, struct tm *time_s)
 {
@@ -375,6 +444,17 @@ void clock_service_init(clock_service *service)
     service->_frequency = 0xFFFF;
     service->_counter = 1;
     service->_is_1hz = true;
+
+    // set all operation pointers to common_nop();
+    for (size_t i = 0; i < 16; i++)
+    {
+        service->second_ops[i] = common_nop;
+        service->minute_ops[i] = common_nop;
+        service->hour_ops[i] = common_nop;
+        service->day_ops[i] = common_nop;
+        service->month_ops[i] = common_nop;
+        service->year_ops[i] = common_nop;
+    }
 
     // Initialize function pointers
     service->update = clock_service_update;
