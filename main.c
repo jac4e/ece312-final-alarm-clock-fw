@@ -69,6 +69,10 @@ int main(int argc, char** argv) {
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
 
+    //enable LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+
     lcd_init();
     // Service Initialization
     clock_service_init(&clock_service_instance);
