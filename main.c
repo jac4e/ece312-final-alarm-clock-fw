@@ -20,9 +20,11 @@
 #include "lcd.h"
 #include "hd44780.h"
 #include "services/clock-service/clock-service.h"
-#include "services/audio-service/audio-service.h"
 #include "services/clock-service/alarm/alarm-service.h"
+#include "services/audio-service/audio-service.h"
+#include "services/gesture-service/gesture-service.h"
 #include "interfaces/audio-interface/audio-interface.h"
+#include "interfaces/gesture-interface/gesture-interface.h"
 
 // Setup Device Globals
 static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
@@ -32,6 +34,7 @@ static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
 /*************************/
 
 audio_device audio_device_instance;
+gesture_device_t gesture_device;
 
 /***********************/
 /* Service Definitions */
@@ -40,6 +43,7 @@ audio_device audio_device_instance;
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
 alarm_service_t alarm_service_instance;
+gesture_service_t gesture_service;
 
 /*******************/
 /* ISR Definitions */
@@ -61,13 +65,27 @@ ISR(TIMER0_COMPA_vect) {
     audio_service_instance.update(&audio_service_instance);
 }
 
+ISR(PCINT1_vect) {
+    // This ISR will be called when a change occurs on any of the pins PC0-PC7
+    gesture_service.update(&gesture_service, &alarm_service_instance);
+}
+
 /****************/
 /* Main Program */
 /****************/
 
 int main(int argc, char** argv) {
+    // disable external clock source (use internal clock source)
+
+    // enables LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+    
+//    ASSR &= ~(1 << AS2);
+
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
+    gesture_interface_init(&gesture_device);
 
     //enable LCD backlight on PB5
     DDRB |= (1 << PB5);
@@ -79,6 +97,7 @@ int main(int argc, char** argv) {
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
     initializeAlarmService(&alarm_service_instance, &audio_service_instance);
+    gesture_service_init(&gesture_service, &gesture_device);
 
     // Initialize any clock cron like operations
     clock_op_handle_t alarm_op_handle = {0, MINUTE_OP};
