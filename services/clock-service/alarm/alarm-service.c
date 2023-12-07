@@ -49,31 +49,33 @@ void alarm_service_updateAlarmState(alarm_service_t *service, clock_service *mai
   for(uint8_t i; i < 8; i++){
 
     // ensures that the alarm is only updated every second
-    if(mainClock->_counter == 1){
+      if(mainClock->_service_is_1hz){
+        if(mainClock->_counter == 1){
+      
+        // checks the current state of the timer
+        switch (service->_alarms[i].state){
+          case idle:
+            // triggeres the alarm if the correct time has been reached
+            if(((uint8_t) time_s.tm_hour) == service->_alarms[i].hour && ((uint8_t) time_s.tm_min) == service->_alarms[i].minute){
+              service->triggerAlarm(service, i);
+            }
+          break;
+          case snooze:
+            
+            // updates the amount of time remaining in snooze state or triggers
+            // the alarm if there is no more time lift in snooze state
+            if(service->_alarms[i].snoozeRemaining > 0){
+              service->_alarms[i].snoozeRemaining--;
+            } else {
+              service->triggerAlarm(service, i);
+            }
+          break;
+          case triggered:
+            
+          default:
 
-      // checks the current state of the timer
-      switch (service->_alarms[i].state){
-        case idle:
-          // triggeres the alarm if the correct time has been reached
-          if(((uint8_t) time_s.tm_hour) == service->_alarms[i].hour && ((uint8_t) time_s.tm_min) == service->_alarms[i].minute){
-            service->triggerAlarm(service, i);
-          }
-        break;
-        case snooze:
-          
-          // updates the amount of time remaining in snooze state or triggers
-          // the alarm if there is no more time lift in snooze state
-          if(service->_alarms[i].snoozeRemaining > 0){
-            service->_alarms[i].snoozeRemaining--;
-          } else {
-            service->triggerAlarm(service, i);
-          }
-        break;
-        case triggered:
-          
-        default:
-
-        break;
+          break;
+        }
       }
     }
   }
