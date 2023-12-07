@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <time.h>
 
-typedef size_t clock_op_handle_t;
 
 typedef enum
 {
@@ -17,11 +16,19 @@ typedef enum
     YEAR_OP // Run every year
 } op_type;
 
+typedef struct clock_op_handle_t clock_op_handle_t;
+
+struct clock_op_handle_t
+{
+    uint8_t index;
+    op_type type;
+};
+
 // Define the structure for the clock service
 typedef struct clock_service clock_service;
 
 // Typedef for clock op functions
-typedef void (*clock_op)(clock_service *service, void *data);
+typedef void (*clock_op)(time_t *t, void *data);
 
 struct clock_service
 {
@@ -60,7 +67,7 @@ struct clock_service
     // Function that wakes the service
     void (*wake)(clock_service *service);
     // Function that adds an operation to the service
-    clock_op_handle_t (*add_op)(clock_service *service, void (*op)(struct clock_service *service, void *data), void *data, op_type type);
+    clock_op_handle_t (*add_op)(clock_op_handle_t *handle, clock_service *service, void (*op)(struct clock_service *service, void *data), void *data);
     // Function that removes an operation from the service
     void (*remove_op)(clock_service *service, clock_op_handle_t handle);
     // Function to set the time

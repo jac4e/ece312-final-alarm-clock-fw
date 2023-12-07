@@ -78,19 +78,22 @@ int main(int argc, char** argv) {
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
-    initializeAlarmService(&alarm_service_instance, &audio_device_instance);
+    initializeAlarmService(&alarm_service_instance, &audio_service_instance);
 
     // Initialize any clock cron like operations
-    clock_service_instance.add_op(&clock_service_instance, &alarm_service_instance.updateAlarmState, &alarm_service_instance, MINUTE_OP);
+    clock_op_handle_t alarm_op_handle = {0, MINUTE_OP};
+    clock_service_instance.add_op(&alarm_op_handle, &clock_service_instance, alarm_service_instance.updateAlarmState, &alarm_service_instance);
     
     struct tm time_s = {0};
 
     #if TEST_SECTION == TEST_ALARM
-    fprintf(&lcd, "\ecAlarm Test in 1m");
-    _delay_ms(1000);
     clock_service_instance.get_time(&clock_service_instance, &time_s);
     time_s.tm_min++;
+    fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
     alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    time_s.tm_min--;
+    fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+    _delay_ms(5000);
     #endif // TEST_ALARM
 
     #if TEST_SECTION == TEST_AUDIO_BASIC

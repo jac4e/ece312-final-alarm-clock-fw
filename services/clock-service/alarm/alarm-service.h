@@ -37,17 +37,24 @@ struct alarm_service_t {
 
     // Timer service has 8 alarms
     alarm_t _alarms[8];
+    
+    // boolean to store if the alarm service is awake
+    bool _is_awake;
 
     // sets an alarm
     void (*setAlarm)(alarm_service_t *service, struct tm *setTime, uint8_t alarmSelection);
     // stops an alarm after its been triggered
     void (*stopAlarm)(alarm_service_t *service);
-    // triggres an alarm
+    // triggrs an alarm
     void (*triggerAlarm)(alarm_service_t *service, uint8_t selectedAlarm);
     // disables an alarm
     void (*disableAlarm)(alarm_service_t *service, uint8_t alarmSelection);
     // updates the state of the alarm service
     void (*updateAlarmState)(clock_service *mainClock, alarm_service_t *service);
+    // Sleeps the alarm service
+    void (*sleep)(alarm_service_t *service);
+    // wakes the alarm service
+    void (*wake)(alarm_service_t *service);
 
     // puts the alarm in snooze state
     void (*triggerSnooze)(alarm_service_t *service);  

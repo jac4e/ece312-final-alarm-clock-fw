@@ -1,6 +1,7 @@
 #include "alarm-service.h"
 #include "../../../defines.h"
 #include "../clock-service.h"
+#include "../../../common.h"
 #include "../../audio-service/audio-service.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -40,7 +41,10 @@ void alarm_service_disableAlarm(alarm_service_t *service, uint8_t alarmSelection
   service->_alarmAudioService->pause(service->_alarmAudioService);
 }
 
-void alarm_service_updateAlarmState(alarm_service_t *service, clock_service *mainClock){
+void alarm_service_updateAlarmState(clock_service *mainClock, alarm_service_t *service){
+  if (!service->_is_awake) {
+    return;
+  }
 
   // gets the current time from the main clock
   struct tm time_s = {0};
@@ -48,33 +52,31 @@ void alarm_service_updateAlarmState(alarm_service_t *service, clock_service *mai
 
   for(uint8_t i; i < 8; i++){
 
-    // ensures that the alarm is only updated every second
-    if(mainClock->_counter == 1){
-
-      // checks the current state of the timer
-      switch (service->_alarms[i].state){
-        case idle:
-          // triggeres the alarm if the correct time has been reached
-          if(((uint8_t) time_s.tm_hour) == service->_alarms[i].hour && ((uint8_t) time_s.tm_min) == service->_alarms[i].minute){
-            service->triggerAlarm(service, i);
-          }
-        break;
-        case snooze:
-          
-          // updates the amount of time remaining in snooze state or triggers
-          // the alarm if there is no more time lift in snooze state
-          if(service->_alarms[i].snoozeRemaining > 0){
-            service->_alarms[i].snoozeRemaining--;
-          } else {
-            service->triggerAlarm(service, i);
-          }
-        break;
-        case triggered:
-          
-        default:
-
-        break;
+    // checks the current state of the timer
+    switch (service->_alarms[i].state){
+      case idle:{
+        // triggers the alarm if the correct time has been reached
+        if(((uint8_t) time_s.tm_hour) == service->_alarms[i].hour && ((uint8_t) time_s.tm_min) == service->_alarms[i].minute){
+          service->triggerAlarm(service, i);
+        }
+      break;
       }
+      case snooze:{
+        
+        // updates the amount of time remaining in snooze state or triggers
+        // the alarm if there is no more time lift in snooze state
+        if(service->_alarms[i].snoozeRemaining > 0){
+          service->_alarms[i].snoozeRemaining--;
+        } else {
+          service->triggerAlarm(service, i);
+        }
+      break;}
+      case triggered:{
+        // do nothing
+      break;}
+      default:{
+
+      break;}
     }
   }
 }
@@ -91,6 +93,15 @@ void alarm_service_triggerSnooze(alarm_service_t *service){
   }
 }
 
+void alarm_service_sleep(alarm_service_t *service){
+  service->_is_awake = false;
+}
+
+void alarm_service_wake(alarm_service_t *service){
+  service->_is_awake = true;
+}
+
+
 void initializeAlarmService(alarm_service_t *service, audio_service *audioService) {
   
   // disable all alarms on service
@@ -106,6 +117,9 @@ void initializeAlarmService(alarm_service_t *service, audio_service *audioServic
 
   // stores a pointer to the main audio service as the alarms audio service
   service->_alarmAudioService = audioService;
+
+  // set the service to awake
+  service->_is_awake = true;
 
   //function pointer initialization
   service->setAlarm = alarm_service_setAlarm;
