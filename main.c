@@ -69,23 +69,34 @@ int main(int argc, char** argv) {
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
 
+    //enable LCD backlight on PB5
+    DDRB |= (1 << PB5);
+    PORTB |= (1 << PB5);
+    
+
     lcd_init();
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
-    initalizeAlarmService(&alarm_service_instance, &audio_device_instance);
+    initializeAlarmService(&alarm_service_instance, &audio_device_instance);
+    
+    struct tm time_s = {0};
+    clock_service_instance.get_time(&clock_service_instance, &time_s);
+    time_s.tm_min++;
+//    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    time_s.tm_min--;
 
     sei();
     
     // Main loop
     while (1) {
         // Main program loop
-        struct tm time_s = {0};
         clock_service_instance.get_time(&clock_service_instance, &time_s);
+        alarm_service_instance.updateAlarmState(&alarm_service_instance, &clock_service_instance);
         // hour:minute:second
         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
+        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
         _delay_ms(100);
     }
 

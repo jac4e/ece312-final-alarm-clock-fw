@@ -6,7 +6,7 @@
 #include <time.h>
 #include "../clock-service.h"
 #include "../../audio-service/audio-service.h"
-#define ALARM_AMOUNT 8 // the amount of alarms the service supports
+// #define ALARM_AMOUNT 8 // the amount of alarms the service supports
 
 typedef enum {
   disabled,
@@ -36,7 +36,7 @@ struct alarm_service_t {
     uint8_t _snoozePeriod; 
 
     // Timer service has 8 alarms
-    alarm_t _alarms[ALARM_AMOUNT];
+    alarm_t _alarms[8];
 
     // sets an alarm
     void (*setAlarm)(alarm_service_t *service, struct tm *setTime, uint8_t alarmSelection);
@@ -53,6 +53,6 @@ struct alarm_service_t {
     void (*triggerSnooze)(alarm_service_t *service);  
 };
 
-void initalizeAlarmService(alarm_service_t *service, audio_service *audioService);
+void initializeAlarmService(alarm_service_t *service, audio_service *audioService);
 
 #endif // DUMMY_SERVICE_H

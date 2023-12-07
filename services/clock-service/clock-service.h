@@ -6,7 +6,6 @@
 #include <time.h>
 
 typedef size_t clock_op_handle_t;
-
 typedef enum
 {
     SECOND_OP,
