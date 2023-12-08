@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.c
  * Author: jacques
  *
@@ -6,6 +6,7 @@
  */
 
 #include "defines.h"
+#include "state.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,7 @@
 
 // Setup Device Globals
 static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
+state_t state;
 
 /*************************/
 /* Interface Definitions */
@@ -51,23 +53,27 @@ gesture_service_t gesture_service;
 /* ISR Definitions */
 /*******************/
 #if RTC_CRYSTAL_PRESENT
-ISR(TIMER2_OVF_vect) {
+ISR(TIMER2_OVF_vect)
+{
 #else
-ISR(TIMER2_COMPA_vect) {
-#endif    
+ISR(TIMER2_COMPA_vect)
+{
+#endif
     // This ISR will be called when Timer2 overflows (Roughly ever second)
     // Call the clock service update function
     clock_service_instance.update(&clock_service_instance);
 }
 
-ISR(TIMER0_COMPA_vect) {
+ISR(TIMER0_COMPA_vect)
+{
     // This ISR will be called when Timer0 compare matches
     // Call the audio service update function
     // This is only used for basic audio devices
     audio_service_instance.update(&audio_service_instance);
 }
 
-ISR(PCINT1_vect) {
+ISR(PCINT1_vect)
+{
     // This ISR will be called when a change occurs on any of the pins PC0-PC7
     gesture_service.update(&gesture_service, &alarm_service_instance);
 }
@@ -76,25 +82,28 @@ ISR(PCINT1_vect) {
 /* Main Program */
 /****************/
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
+    // Initialize the state
+    state_init(&state);
+
     // disable external clock source (use internal clock source)
 
     // enables LCD backlight on PB5
     DDRB |= (1 << PB5);
     PORTB |= (1 << PB5);
-    
-//    ASSR &= ~(1 << AS2);
+
+    //    ASSR &= ~(1 << AS2);
 
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
     gesture_interface_init(&gesture_device);
 
-    //enable LCD backlight on PB5
+    // enable LCD backlight on PB5
     DDRB |= (1 << PB5);
     PORTB |= (1 << PB5);
-    
 
-    //enable LCD backlight on PB5
+    // enable LCD backlight on PB5
     DDRB |= (1 << PB5);
     PORTB |= (1 << PB5);
 
@@ -111,12 +120,12 @@ int main(int argc, char** argv) {
     clock_service_instance.add_op(&alarm_op_handle, &clock_service_instance, alarm_service_instance.updateAlarmState, &alarm_service_instance);
     clock_op_handle_t timer_op_handle = {0, SECOND_OP};
     clock_service_instance.add_op(&timer_op_handle, &clock_service_instance, timer_service_instance.updateTimerState, &timer_service_instance);
-    
+
     struct tm time_s = {0};
 
-    #if TEST_SECTION == TEST_TIMER
+#if TEST_SECTION == TEST_TIMER
     clock_service_instance.get_time(&clock_service_instance, &time_s);
-    
+
     struct tm timerLength = {0};
     timerLength.tm_min = 1;
     timerLength.tm_sec = 10;
@@ -124,9 +133,9 @@ int main(int argc, char** argv) {
     fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
     timer_service_instance.setTimer(&timer_service_instance, &clock_service_instance, &timerLength, 0);
     _delay_ms(5000);
-    #endif // TEST_TIMER
+#endif // TEST_TIMER
 
-    #if TEST_SECTION == TEST_ALARM
+#if TEST_SECTION == TEST_ALARM
     clock_service_instance.get_time(&clock_service_instance, &time_s);
     time_s.tm_min++;
     fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
@@ -135,19 +144,19 @@ int main(int argc, char** argv) {
     time_s.tm_min--;
     fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
     _delay_ms(5000);
-    #endif // TEST_ALARM
+#endif // TEST_ALARM
 
-    #if TEST_SECTION == TEST_AUDIO
+#if TEST_SECTION == TEST_AUDIO
     sei();
     while (1)
     {
-        // loop through all the tracks 
-        for (uint8_t i = 0; i < (AUDIO_SERVICE_ALARM_4+1); i++)
+        // loop through all the tracks
+        for (uint8_t i = 0; i < (AUDIO_SERVICE_ALARM_4 + 1); i++)
         {
             audio_service_instance.change_alarm(&audio_service_instance, i);
-            fprintf(&lcd, "\ecAlarm Track %u", i+1);
-            audio_service_instance.play(&audio_service_instance);   
-            
+            fprintf(&lcd, "\ecAlarm Track %u", i + 1);
+            audio_service_instance.play(&audio_service_instance);
+
             // Wait 5 seconds
             _delay_ms(2000);
 
@@ -157,36 +166,126 @@ int main(int argc, char** argv) {
             _delay_ms(2000);
         }
     }
-    #endif // TEST_AUDIO
+#endif // TEST_AUDIO
 
-    #if TEST_SECTION == TEST_GESTURE
+#if TEST_SECTION == TEST_GESTURE
 
-    #endif // TEST_GESTURE
+#endif // TEST_GESTURE
 
-    #if TEST_SECTION == TEST_I2C
+#if TEST_SECTION == TEST_I2C
     fprintf(&lcd, "\ecI2C Test");
     sei();
-    while(1){
+    while (1)
+    {
         audio_device_instance.send_command(&audio_device_instance, 0x04, 0x20);
         _delay_ms(100);
     }
-    #endif // TEST_I2C
+#endif // TEST_I2C
 
     sei();
-    
+
     // Main loop
-    while (1) {
-        // Delay for 100ms at top of loop
-        _delay_ms(100);
-        // Main program loop
-        clock_service_instance.get_time(&clock_service_instance, &time_s);
-        // hour:minute:second
-        fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
-        // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
-        _delay_ms(100);
+    while (1)
+    {
+        // Do any state transition logic here
+        if (state._state_change_pending)
+        {
+            state._state_change_pending = false;
+
+            switch (state._current_state)
+            {
+            case STATE_SLEEP:
+                fprintf(&lcd, "\ecLeaving Sleep");
+                break;
+
+            case STATE_INACTIVE:
+                fprintf(&lcd, "\ecLeaving Inactive");
+                break;
+
+            case STATE_CLOCK:
+                fprintf(&lcd, "\ecLeaving Clock");
+                break;
+
+            case STATE_TIMER:
+                fprintf(&lcd, "\ecLeaving Timer");
+                break;
+
+            case STATE_STOPWATCH:
+                fprintf(&lcd, "\ecLeaving Stopwatch");
+                break;
+
+            case STATE_SETTINGS:
+
+                break;
+
+            default:
+                break;
+            }
+
+            switch (state._next_state)
+            {
+            case STATE_SLEEP:
+                fprintf(&lcd, "\ecEntering Sleep");
+                break;
+
+            case STATE_INACTIVE:
+                fprintf(&lcd, "\ecEntering Inactive");
+                break;
+
+            case STATE_CLOCK:
+                fprintf(&lcd, "\ecEntering Clock");
+                break;
+
+            case STATE_TIMER:
+                fprintf(&lcd, "\ecEntering Timer");
+                break;
+
+            case STATE_STOPWATCH:
+                fprintf(&lcd, "\ecEntering Stopwatch");
+                break;
+
+            case STATE_SETTINGS:
+
+                break;
+
+            default:
+                break;
+            }
+            
+            state._current_state = state._next_state;
+        }
+
+        // Do any state logic here
+        switch (state._current_state)
+        {
+        case STATE_SLEEP:
+            ui_service_instance.sleep(&ui_service_instance, &clock_service_instance);
+            break;
+
+        case STATE_INACTIVE:
+            ui_service_instance.inactive(&ui_service_instance, &clock_service_instance);
+            break;
+
+        case STATE_CLOCK:
+            ui_service_instance.clock(&ui_service_instance, &clock_service_instance);
+            break;
+
+        case STATE_TIMER:
+            ui_service_instance.timer(&ui_service_instance, &clock_service_instance);
+            break;
+
+        case STATE_STOPWATCH:
+            ui_service_instance.stopwatch(&ui_service_instance, &clock_service_instance);
+            break;
+
+        case STATE_SETTINGS:
+            ui_service_instance.settings(&ui_service_instance, &clock_service_instance);
+            break;
+
+        default:
+            break;
+        }
     }
 
     return (EXIT_SUCCESS);
 }
-
