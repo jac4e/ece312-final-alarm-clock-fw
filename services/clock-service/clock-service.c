@@ -143,12 +143,16 @@ void clock_service_update(clock_service *service)
     // Call timed operations
     struct tm time_s = {0};
     service->get_time(service, &time_s);
-    service->minute_ops[time_s.tm_sec](service, service->minute_ops_data[time_s.tm_sec]);
 
     for (size_t i = 0; i < 16; i++)
     {
         // For those that don't make sense to have at a specific time
         service->second_ops[i](service, service->second_ops_data[i]);
+
+        if (time_s.tm_sec == 0)
+        {
+            service->minute_ops[i](service, service->minute_ops_data[i]);
+        }
 
         if (time_s.tm_min == 0 && time_s.tm_sec == 0)
         {
@@ -204,6 +208,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->second_ops[i] = op;
                     service->second_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;
@@ -215,6 +220,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->minute_ops[i] = op;
                     service->minute_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;
@@ -226,6 +232,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->hour_ops[i] = op;
                     service->hour_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;
@@ -237,6 +244,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->day_ops[i] = op;
                     service->day_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;
@@ -248,6 +256,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->month_ops[i] = op;
                     service->month_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;
@@ -259,6 +268,7 @@ void clock_service_add_op(clock_op_handle_t *handle, clock_service *service, voi
                     service->year_ops[i] = op;
                     service->year_ops_data[i] = data;
                     handle->index = i;
+                    break;
                 }
             }
             break;

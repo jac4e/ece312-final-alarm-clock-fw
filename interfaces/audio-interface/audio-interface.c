@@ -1,38 +1,50 @@
 #include "audio-interface.h"
+#include "twi.h"
+#include "../../common.h"
 #include <stddef.h>
 
-// void audio_send_command(audio_device *dev, audio_command command, uint8_t data) {
-//     // Send command to audio device
-//     TWI_start();
-//     TWI_write(AUDIO_DEVICE_ADDR);
-//     TWI_write(command);
-//     TWI_write(data);
-//     TWI_stop();
-// }
+void audio_send_command(audio_device_t *dev, audio_command command, uint8_t data) {
+    switch (command)
+    {
+    case AUDIO_PLAY:
+        // Set PC2 to high
+        PORTC |= (1 << PC2);
+        break;
+    case AUDIO_PAUSE:
+        // Set PC2 to low
+        PORTC &= ~(1 << PC2);
+    case AUDIO_CHANGE_TRACK:
+        // Set PC4 and PC5 based on data
+        PORTC &= ~(0b11 << PC4);
+        PORTC |= (data << PC4);
+        break;
 
-void audio_mute_basic(audio_device *dev) {
+    }
+}
+
+void audio_mute_basic(audio_device_t *dev) {
     // Disconnect OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) from timer0
     TCCR0A &= ~(1 << COM0A0);
     dev->_is_muted = true;
 }
 
-void audio_unmute_basic(audio_device *dev) {
+void audio_unmute_basic(audio_device_t *dev) {
     // Connect OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) to timer0
     TCCR0A |= (1 << COM0A0);
     dev->_is_muted = false;
 }
 
-void audio_set_volume_basic(audio_device *dev, int volume) {
+void audio_set_volume_basic(audio_device_t *dev, int volume) {
     // Not implemented with basic audio device
     // unsure how to implement over PWM
 }
 
 const uint16_t timer0_prescaler_values[] = {0, 1, 8, 64, 256, 1024};
 
-void audio_set_frequency(audio_device *dev, uint16_t freq) {
+void audio_set_frequency(audio_device_t *dev, uint16_t freq) {
     for (dev->_prescale = 0; dev->_prescale < 6; dev->_prescale++)
     {
-        dev->_top = EXT_CLK / (2 * freq * (uint64_t)timer0_prescaler_values[dev->_prescale]) - 1;
+        dev->_top = F_CPU / (2 * freq * (uint64_t)timer0_prescaler_values[dev->_prescale]) - 1;
         if (dev->_top <= 255)
         {
             break;
@@ -43,29 +55,26 @@ void audio_set_frequency(audio_device *dev, uint16_t freq) {
     dev->_freq = freq;
 }
 
-void audio_mute_premium(audio_device *dev) {
-    // Set AUDIO_PWM_AMP_SHDN_PORT pin to low
-    PORTD &= ~(1 << AUDIO_PWM_AMP_SHDN_PORT);
+void audio_mute_premium(audio_device_t *dev) {
+    audio_send_command(dev, AUDIO_PAUSE, 0);
 }
 
-void audio_unmute_premium(audio_device *dev) {
-    // Set AUDIO_PWM_AMP_SHDN_PORT pin to high
-    PORTD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
+void audio_unmute_premium(audio_device_t *dev) {
+    audio_send_command(dev, AUDIO_PLAY, 0);
 }
 
-// void audio_set_volume_premium(audio_device *dev, int volume) {
-//     // Send volume command to audio device
-//     audio_send_command(dev, AUDIO_SET_VOLUME, volume);
-// }
+void audio_set_volume_premium(audio_device_t *dev, int volume) {
+    // Send volume command to audio device
+    audio_send_command(dev, AUDIO_SET_VOLUME, volume);
+}
 
 // Function to initialize the audio device
-void audio_interface_init(audio_device *dev) {
+void audio_interface_init(audio_device_t *dev) {
     // Initialize ID Port (AUDIO_ID_PORT=PD6) as input
     DDRD &= ~(1 << AUDIO_ID_PORT);
 
     // Set ID
-    // dev->_id = (PIND & (1 << AUDIO_ID_PORT)) >> AUDIO_ID_PORT;
-    dev->_id = AUDIO_BASIC;
+    dev->_id = (PINC & (1 << AUDIO_ID_PORT)) >> AUDIO_ID_PORT;
     
     // Initialize device parameters
     dev->_is_muted = true;
@@ -80,14 +89,13 @@ void audio_interface_init(audio_device *dev) {
         dev->unmute = audio_unmute_basic;
         dev->set_volume = audio_set_volume_basic;
         dev->set_freq = audio_set_frequency;
-        dev->send_command = NULL;
+        dev->send_command = common_nop;
     } else if (dev->_id == AUDIO_PREMIUM) {
         dev->mute = audio_mute_premium;
         dev->unmute = audio_unmute_premium;
-        // dev->set_volume = audio_set_volume_premium;
-        // dev->send_command = audio_send_command;
-        dev->set_freq = NULL;
-        dev->send_command = NULL;
+        dev->set_volume = common_nop;
+        dev->send_command = audio_send_command;
+        dev->set_freq = common_nop;
     }
 
     if (dev->_id == AUDIO_BASIC) {
@@ -106,8 +114,7 @@ void audio_interface_init(audio_device *dev) {
         // Set AUDIO_PWM_AMP_SHDN_PORT pin as output
         DDRD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
 
-        // Initialize TWI
-        // TWI_init();
-        // Set PWM pin as output
+        // Initialize  PC2-4 as output
+        DDRC |= (1 << PC2) | (1 << PC4) | (1 << PC5);
     }
 }

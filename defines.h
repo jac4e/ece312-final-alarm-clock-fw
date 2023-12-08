@@ -14,13 +14,14 @@
 
 // Test sections definitions
 #define TEST_ALARM 0
-#define TEST_AUDIO_BASIC 1
-#define TEST_AUDIO_PREMIUM 2
+#define TEST_TIMER 1
+#define TEST_AUDIO 2
 #define TEST_GESTURE 3
 #define TEST_UI 4
+#define TEST_STOPWATCH 5
 
 #if TEST_MODE
-#define TEST_SECTION TEST_ALARM
+#define TEST_SECTION TEST_STOPWATCH
 #endif // TEST_MODE
 
 /*******************/
@@ -29,6 +30,9 @@
 
 #define AUDIO_ID_PORT PC0
 #define AUDIO_PWM_AMP_SHDN_PORT PD6
+#define AUDIO_TWI_SCL_PORT PC5
+#define AUDIO_TWI_SDA_PORT PC4
+
 
 #define GESTURE_SENSOR_PIN PC3
 
@@ -47,7 +51,7 @@
 /* UART baud rate */
 #define UART_BAUD  9600
 
-#define AUDIO_DEVICE_ADDR 0x00 // TODO: Add the correct address here
+#define AUDIO_DEVICE_ADDR 0x69 // TODO: Add the correct address here
 #define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
 // #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
 // #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)
