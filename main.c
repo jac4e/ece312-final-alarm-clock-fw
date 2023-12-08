@@ -5,6 +5,7 @@
  * Created on November 14, 2023, 10:44 PM
  */
 
+
 #include "defines.h"
 
 #include <stdio.h>
@@ -12,18 +13,22 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
-
 #include <util/delay.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "lcd.h"
 #include "hd44780.h"
+
+// Include service files
 #include "services/clock-service/clock-service.h"
 #include "services/clock-service/timer/timer-service.h"
 #include "services/clock-service/alarm/alarm-service.h"
+#include "services/clock-service/stopwatch/stopwatch-service.h"
 #include "services/audio-service/audio-service.h"
 #include "services/gesture-service/gesture-service.h"
+
+// Include interface files
 #include "interfaces/audio-interface/audio-interface.h"
 #include "interfaces/gesture-interface/gesture-interface.h"
 
@@ -45,6 +50,7 @@ volatile clock_service clock_service_instance;
 audio_service_t audio_service_instance;
 timer_service_t timer_service_instance;
 alarm_service_t alarm_service_instance;
+stopwatch_service_t stopwatch_service_instance;
 gesture_service_t gesture_service;
 
 /*******************/
@@ -88,22 +94,14 @@ int main(int argc, char** argv) {
     // Interface Initialization
     audio_interface_init(&audio_device_instance);
     gesture_interface_init(&gesture_device);
-
-    //enable LCD backlight on PB5
-    DDRB |= (1 << PB5);
-    PORTB |= (1 << PB5);
-    
-
-    //enable LCD backlight on PB5
-    DDRB |= (1 << PB5);
-    PORTB |= (1 << PB5);
-
     lcd_init();
+
     // Service Initialization
     clock_service_init(&clock_service_instance);
     audio_service_init(&audio_service_instance, &audio_device_instance);
     initializeTimerService(&timer_service_instance, &audio_service_instance);
     initializeAlarmService(&alarm_service_instance, &clock_service_instance, &audio_service_instance);
+    initializeStopwatchService(&stopwatch_service_instance);
     gesture_service_init(&gesture_service, &gesture_device);
 
     // Initialize any clock cron like operations
@@ -111,6 +109,8 @@ int main(int argc, char** argv) {
     clock_service_instance.add_op(&alarm_op_handle, &clock_service_instance, alarm_service_instance.updateAlarmState, &alarm_service_instance);
     clock_op_handle_t timer_op_handle = {0, SECOND_OP};
     clock_service_instance.add_op(&timer_op_handle, &clock_service_instance, timer_service_instance.updateTimerState, &timer_service_instance);
+    clock_op_handle_t stopwatch_op_handle = {0, SECOND_OP};
+    clock_service_instance.add_op(&stopwatch_op_handle, &clock_service_instance, stopwatch_service_instance.updateStopwatch,  &stopwatch_service_instance);
     
     struct tm time_s = {0};
 
@@ -136,6 +136,18 @@ int main(int argc, char** argv) {
     fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
     _delay_ms(5000);
     #endif // TEST_ALARM
+
+    #if TEST_SECTION == TEST_STOPWATCH
+      stopwatch_service_instance.resetStopwatch(&stopwatch_service_instance);
+      sei();
+
+      while(1){
+         _delay_ms(100);
+         stopwatch_service_instance.getStopwatchTime(&stopwatch_service_instance, &time_s);
+         fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+         _delay_ms(100);
+      }
+    #endif // TEST_STOPWATCH
 
     #if TEST_SECTION == TEST_AUDIO
     sei();

@@ -18,10 +18,10 @@
 #define TEST_AUDIO 2
 #define TEST_GESTURE 3
 #define TEST_UI 4
-#define TEST_I2C 5
+#define TEST_STOPWATCH 5
 
 #if TEST_MODE
-#define TEST_SECTION TEST_AUDIO
+#define TEST_SECTION TEST_STOPWATCH
 #endif // TEST_MODE
 
 /*******************/

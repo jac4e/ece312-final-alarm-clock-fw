@@ -17,9 +17,7 @@
                        displayName="audio-interface"
                        projectFiles="true">
           <itemPath>interfaces/audio-interface/audio-interface.c</itemPath>
-          <itemPath>interfaces/audio-interface/twi.h</itemPath>
           <itemPath>interfaces/audio-interface/audio-interface.h</itemPath>
-          <itemPath>interfaces/audio-interface/twi.c</itemPath>
         </logicalFolder>
         <logicalFolder name="gesture-interface"
                        displayName="gesture-interface"
@@ -41,6 +39,10 @@
           <logicalFolder name="alarm" displayName="alarm" projectFiles="true">
             <itemPath>services/clock-service/alarm/alarm-service.c</itemPath>
             <itemPath>services/clock-service/alarm/alarm-service.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="stopwatch" displayName="stopwatch" projectFiles="true">
+            <itemPath>services/clock-service/stopwatch/stopwatch-service.c</itemPath>
+            <itemPath>services/clock-service/stopwatch/stopwatch-service.h</itemPath>
           </logicalFolder>
           <logicalFolder name="timer" displayName="timer" projectFiles="true">
             <itemPath>services/clock-service/timer/timer-service.c</itemPath>
