@@ -7,29 +7,45 @@ void audio_send_command(audio_device_t *dev, audio_command command, uint8_t data
     switch (command)
     {
     case AUDIO_PLAY:
-        // Set PC2 to high
-        PORTC |= (1 << PC2);
+        PORTC |= (1 << AUDIO_PLAYPAUSE_PORT);
         break;
     case AUDIO_PAUSE:
-        // Set PC2 to low
-        PORTC &= ~(1 << PC2);
+        PORTC &= ~(1 << AUDIO_PLAYPAUSE_PORT);
     case AUDIO_CHANGE_TRACK:
-        // Set PC4 and PC5 based on data
-        PORTC &= ~(0b11 << PC4);
-        PORTC |= (data << PC4);
-        break;
+        // Set sel0 and sel1 based on data
 
+        switch (data)
+        {
+        case 0:
+            PORTD &= ~(1 << AUDIO_PWM_SEL0_PORT);
+            PORTC &= ~(1 << AUDIO_SEL1_PORT);
+            break;
+        case 1:
+            PORTD |= (1 << AUDIO_PWM_SEL0_PORT);
+            PORTC &= ~(1 << AUDIO_SEL1_PORT);
+            break;
+        case 2:
+            PORTD &= ~(1 << AUDIO_PWM_SEL0_PORT);
+            PORTC |= (1 << AUDIO_SEL1_PORT);
+            break;
+        case 3:
+            PORTD |= (1 << AUDIO_PWM_SEL0_PORT);
+            PORTC |= (1 << AUDIO_SEL1_PORT);
+            break;
+        default:
+            break;
+        }
     }
 }
 
 void audio_mute_basic(audio_device_t *dev) {
-    // Disconnect OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) from timer0
+    // Disconnect OC0A (aka AUDIO_PWM_SEL0_PORT) from timer0
     TCCR0A &= ~(1 << COM0A0);
     dev->_is_muted = true;
 }
 
 void audio_unmute_basic(audio_device_t *dev) {
-    // Connect OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) to timer0
+    // Connect OC0A (aka AUDIO_PWM_SEL0_PORT) to timer0
     TCCR0A |= (1 << COM0A0);
     dev->_is_muted = false;
 }
@@ -99,22 +115,22 @@ void audio_interface_init(audio_device_t *dev) {
     }
 
     if (dev->_id == AUDIO_BASIC) {
-        // Set AUDIO_PWM_AMP_SHDN_PORT pin as output
-        DDRD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
-        // Set AUDIO_PWM_AMP_SHDN_PORT pin to low
-        PORTD &= ~(1 << AUDIO_PWM_AMP_SHDN_PORT);
+        // Set AUDIO_PWM_SEL0_PORT pin as output
+        DDRD |= (1 << AUDIO_PWM_SEL0_PORT);
+        // Set AUDIO_PWM_SEL0_PORT pin to low
+        PORTD &= ~(1 << AUDIO_PWM_SEL0_PORT);
 
-        // Initialize timer0 forCTC Mode with OC0A (aka AUDIO_PWM_AMP_SHDN_PORT) disconnected
+        // Initialize timer0 forCTC Mode with OC0A (aka AUDIO_PWM_SEL0_PORT) disconnected
         TCCR0A = (1 << WGM01);
         
         // Set frequency
         audio_set_frequency(dev, 220);
     } else {
-        // Initialize AUDIO_PWM_AMP_SHDN_PORT pin as output for muting
-        // Set AUDIO_PWM_AMP_SHDN_PORT pin as output
-        DDRD |= (1 << AUDIO_PWM_AMP_SHDN_PORT);
-
-        // Initialize  PC2-4 as output
-        DDRC |= (1 << PC2) | (1 << PC4) | (1 << PC5);
+        // Initialize AUDIO_PWM_SEL0_PORT pin as output for sel0
+        DDRD |= (1 << AUDIO_PWM_SEL0_PORT);
+        // Initialize AUDIO_SEL1_PORT pin as output for sel1
+        DDRC |= (1 << AUDIO_SEL1_PORT);
+        // Initialize AUDIO_PLAYPAUSE_PORT pin as output for play/pause
+        DDRC |= (1 << AUDIO_PLAYPAUSE_PORT);
     }
 }

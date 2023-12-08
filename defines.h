@@ -21,7 +21,7 @@
 #define TEST_STOPWATCH 5
 
 #if TEST_MODE
-#define TEST_SECTION TEST_STOPWATCH
+#define TEST_SECTION TEST_AUDIO
 #endif // TEST_MODE
 
 /*******************/
@@ -29,9 +29,9 @@
 /*******************/
 
 #define AUDIO_ID_PORT PC0
-#define AUDIO_PWM_AMP_SHDN_PORT PD6
-#define AUDIO_TWI_SCL_PORT PC5
-#define AUDIO_TWI_SDA_PORT PC4
+#define AUDIO_PWM_SEL0_PORT PD6
+#define AUDIO_SEL1_PORT PC5
+#define AUDIO_PLAYPAUSE_PORT PC4
 
 
 #define GESTURE_SENSOR_PIN PC3

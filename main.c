@@ -27,11 +27,11 @@
 #include "services/clock-service/stopwatch/stopwatch-service.h"
 #include "services/audio-service/audio-service.h"
 #include "services/gesture-service/gesture-service.h"
+#include "services/ui-service/ui-service.h"
 
 // Include interface files
 #include "interfaces/audio-interface/audio-interface.h"
 #include "interfaces/gesture-interface/gesture-interface.h"
-#include "services/ui-service/ui-service.h"
 
 
 // Setup Device Globals
@@ -199,16 +199,6 @@ int main(int argc, char** argv) {
     #if TEST_SECTION == TEST_GESTURE
 
     #endif // TEST_GESTURE
-
-    #if TEST_SECTION == TEST_I2C
-    //fprintf(&lcd, "\ecI2C Test");
-//    sei();
-//    while(1){
-//        audio_device_instance.send_command(&audio_device_instance, 0x04, 0x20);
-//        _delay_ms(100);
-//    }
-    #endif // TEST_I2C
-
 
     sei();
     
