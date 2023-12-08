@@ -201,12 +201,12 @@ int main(int argc, char** argv) {
     #endif // TEST_GESTURE
 
     #if TEST_SECTION == TEST_I2C
-    fprintf(&lcd, "\ecI2C Test");
-    sei();
-    while(1){
-        audio_device_instance.send_command(&audio_device_instance, 0x04, 0x20);
-        _delay_ms(100);
-    }
+    //fprintf(&lcd, "\ecI2C Test");
+//    sei();
+//    while(1){
+//        audio_device_instance.send_command(&audio_device_instance, 0x04, 0x20);
+//        _delay_ms(100);
+//    }
     #endif // TEST_I2C
 
 
