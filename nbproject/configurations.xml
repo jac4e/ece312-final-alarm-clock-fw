@@ -43,18 +43,15 @@
           <itemPath>services/clock-service/clock-service.c</itemPath>
           <itemPath>services/clock-service/clock-service.h</itemPath>
         </logicalFolder>
-
         <logicalFolder name="gesture-service"
                        displayName="gesture-service"
                        projectFiles="true">
           <itemPath>services/gesture-service/gesture-service.c</itemPath>
           <itemPath>services/gesture-service/gesture-service.h</itemPath>
         </logicalFolder>
-
         <logicalFolder name="ui-service" displayName="ui-service" projectFiles="true">
           <itemPath>services/ui-service/ui-service.h</itemPath>
           <itemPath>services/ui-service/ui-service.c</itemPath>
-
         </logicalFolder>
       </logicalFolder>
       <itemPath>main.c</itemPath>
@@ -220,7 +217,6 @@
       </AVR-LD>
       <Tool>
         <property key="AutoSelectMemRanges" value="auto"/>
-
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UpdateOptions"
@@ -234,7 +230,6 @@
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
         <property key="debugoptions.simultaneous.debug" value="false"/>
-
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
@@ -259,12 +254,12 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-3fff"/>
         <property key="poweroptions.powerenable" value="false"/>
+        <property key="programmerToGoFilePath"
+                  value="/home/joshua/uni/312/ece312-final-alarm-clock-fw/debug/default/default_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>
         <property key="programoptions.pgmspeed" value="Med"/>
-        <property key="programmerToGoFilePath"
-                  value="/home/joshua/uni/312/ece312-final-alarm-clock-fw/debug/default/default_ptg"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges" value="0-3ff"/>
         <property key="programoptions.preserveeeprom" value="false"/>
@@ -272,11 +267,9 @@
         <property key="programoptions.preserveprogram.ranges" value=""/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.preserveuserid" value="false"/>
-
         <property key="programoptions.programcalmem" value="false"/>
         <property key="programoptions.programuserotp" value="false"/>
         <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
-
         <property key="toolpack.updateoptions"
                   value="toolpack.updateoptions.uselatestoolpack"/>
         <property key="toolpack.updateoptions.packversion"
@@ -329,7 +322,6 @@
                   value="Press to select which tool pack to use"/>
         <property key="voltagevalue" value=""/>
       </mEdbgTool>
-
       <snap>
         <property key="AutoSelectMemRanges" value="auto"/>
         <property key="ToolFirmwareFilePath"

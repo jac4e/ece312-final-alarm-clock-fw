@@ -10,7 +10,7 @@
 /* Test Mode Settings */
 /**********************/
 
-#define TEST_MODE 1 // Set to 1 to enable test mode, 0 to disable test mode
+#define TEST_MODE 0 // Set to 1 to enable test mode, 0 to disable test mode
 
 // Test sections definitions
 #define TEST_ALARM 0

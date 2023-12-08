@@ -44,7 +44,7 @@ gesture_device_t gesture_device;
 
 volatile clock_service clock_service_instance;
 audio_service audio_service_instance;
-alarm_service_t alarm_service_instance;
+volatile alarm_service_t alarm_service_instance;
 gesture_service_t gesture_service;
 
 volatile ui_data ui_data_instance = {0,1,0};
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
     lcd_init();
 
     // Service Initialization
-    ui_service_init(&ui_data_instance);
+    ui_service_init(&ui_data_instance, &alarm_service_instance, &clock_service_instance);
     clock_service_init(&clock_service_instance);
 
     audio_service_init(&audio_service_instance, &audio_device_instance);
@@ -132,12 +132,13 @@ int main(int argc, char** argv) {
     #if TEST_SECTION == TEST_ALARM
     clock_service_instance.get_time(&clock_service_instance, &time_s);
     time_s.tm_min++;
+    //time_s.tm_min++;
     //fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
-    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
-    alarm_service_instance._snoozePeriod = 1;
+    //alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    //alarm_service_instance._snoozePeriod = 1;
     time_s.tm_min--;
     //fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
-    _delay_ms(5000);
+    //_delay_ms(5000);
     #endif // TEST_ALARM
 
     #if TEST_SECTION == TEST_AUDIO_BASIC
