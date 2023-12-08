@@ -5,7 +5,7 @@
  * Created on November 14, 2023, 10:44 PM
  */
 
-
+#define F_CPU 16000000UL
 #include "defines.h"
 
 #include <stdio.h>
@@ -31,9 +31,11 @@
 // Include interface files
 #include "interfaces/audio-interface/audio-interface.h"
 #include "interfaces/gesture-interface/gesture-interface.h"
+#include "services/ui-service/ui-service.h"
+
 
 // Setup Device Globals
-static FILE lcd = FDEV_SETUP_STREAM(lcd_putchar, NULL, _FDEV_SETUP_WRITE);
+//extern FILE lcd;
 
 /*************************/
 /* Interface Definitions */
@@ -51,7 +53,10 @@ audio_service_t audio_service_instance;
 timer_service_t timer_service_instance;
 alarm_service_t alarm_service_instance;
 stopwatch_service_t stopwatch_service_instance;
+
 gesture_service_t gesture_service;
+
+volatile ui_data ui_data_instance = {0,1,0};
 
 /*******************/
 /* ISR Definitions */
@@ -78,11 +83,28 @@ ISR(PCINT1_vect) {
     gesture_service.update(&gesture_service, &alarm_service_instance);
 }
 
+ISR(PCINT0_vect){//check buttons
+    if(!(PINB & (1<<PINB0))){
+        ui_data_instance.button=1;
+    }
+    if(!(PINB & (1<<PINB1))){
+        ui_data_instance.button=2;
+    }
+    if(!(PINB & (1<<PINB2))){
+        ui_data_instance.button=3;
+    }
+    if(!(PINB & (1<<PINB3))){
+        ui_data_instance.button=4;
+    }
+}    
+
+
 /****************/
 /* Main Program */
 /****************/
 
 int main(int argc, char** argv) {
+
     // disable external clock source (use internal clock source)
 
     // enables LCD backlight on PB5
@@ -97,7 +119,9 @@ int main(int argc, char** argv) {
     lcd_init();
 
     // Service Initialization
+    ui_service_init(&ui_data_instance, &alarm_service_instance, &clock_service_instance);
     clock_service_init(&clock_service_instance);
+
     audio_service_init(&audio_service_instance, &audio_device_instance);
     initializeTimerService(&timer_service_instance, &audio_service_instance);
     initializeAlarmService(&alarm_service_instance, &clock_service_instance, &audio_service_instance);
@@ -129,12 +153,13 @@ int main(int argc, char** argv) {
     #if TEST_SECTION == TEST_ALARM
     clock_service_instance.get_time(&clock_service_instance, &time_s);
     time_s.tm_min++;
-    fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
-    alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
-    alarm_service_instance._snoozePeriod = 1;
+    //time_s.tm_min++;
+    //fprintf(&lcd, "\ecAlarm: %02u:%02u", time_s.tm_hour, time_s.tm_min);
+    //alarm_service_instance.setAlarm(&alarm_service_instance, &time_s, 0);
+    //alarm_service_instance._snoozePeriod = 1;
     time_s.tm_min--;
-    fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
-    _delay_ms(5000);
+    //fprintf(&lcd, "\enTime:: %02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+    //_delay_ms(5000);
     #endif // TEST_ALARM
 
     #if TEST_SECTION == TEST_STOPWATCH
@@ -157,7 +182,7 @@ int main(int argc, char** argv) {
         for (uint8_t i = 0; i < (AUDIO_SERVICE_ALARM_4+1); i++)
         {
             audio_service_instance.change_alarm(&audio_service_instance, i);
-            fprintf(&lcd, "\ecAlarm Track %u", i+1);
+            //fprintf(&lcd, "\ecAlarm Track %u", i+1);
             audio_service_instance.play(&audio_service_instance);   
             
             // Wait 5 seconds
@@ -184,6 +209,7 @@ int main(int argc, char** argv) {
     }
     #endif // TEST_I2C
 
+
     sei();
     
     // Main loop
@@ -193,9 +219,20 @@ int main(int argc, char** argv) {
         // Main program loop
         clock_service_instance.get_time(&clock_service_instance, &time_s);
         // hour:minute:second
-        fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
+        //fprintf(&lcd, "\ec%02u:%02u:%02u", time_s.tm_hour, time_s.tm_min, time_s.tm_sec);
         // day/month/year
-        fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
+
+        //fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
+
+
+        //fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon + 1, time_s.tm_year + 1900);
+
+        //fprintf(&lcd, "\en%02u/%02u/%04u", time_s.tm_mday, time_s.tm_mon, time_s.tm_year + 1900);
+        //cli();
+        ui_update(&time_s);
+        ui_data_instance.button=0;
+        //sei();
+        
         _delay_ms(100);
     }
 

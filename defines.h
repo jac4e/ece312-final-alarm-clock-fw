@@ -10,7 +10,7 @@
 /* Test Mode Settings */
 /**********************/
 
-#define TEST_MODE 1 // Set to 1 to enable test mode, 0 to disable test mode
+#define TEST_MODE 0 // Set to 1 to enable test mode, 0 to disable test mode
 
 // Test sections definitions
 #define TEST_ALARM 0
@@ -43,6 +43,7 @@
 /* The data bits have to be not only in ascending order but also consecutive. */
 #define HD44780_D4 D, 0
 
+
 /**********************/
 /* System Definitions */
 /**********************/
@@ -54,6 +55,7 @@
 #define F_CPU 16000000UL // For Xplained Mini (16 MHz external clock)
 // #define F_CPU 8000000UL // For ATmega328P (8 MHz internal clock)
 // #define F_CPU 1000000UL // For ATmega328P (1 MHz internal clock)
+
 
 #define RTC_CRYSTAL_PRESENT 0 // Set to 1 if RTC crystal is present, 0 otherwise
 #define ONEMHZ_CRYSTAL_PRESENT 0 // Set to 1 if 1 MHz crystal is present, 0 otherwise
